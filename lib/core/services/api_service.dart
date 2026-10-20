@@ -8,6 +8,7 @@ import 'session_service.dart';
 import '../../models/user_model.dart';
 import '../../models/indicator_model.dart';
 import '../../models/token_metrics_model.dart';
+import '../../models/resumen_jornada_model.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -35,24 +36,39 @@ class ApiService {
           final currentBase = await ApiConfig.getBaseUrl();
           options.baseUrl = currentBase;
 
-          // Inyectar Bearer token si existe
+          // Inyectar Bearer token y cabeceras de sesión única
           final token = SessionService.token;
+          final user = SessionService.currentUser;
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
+            options.headers['X-Session-Token'] = token;
+          }
+          if (user != null && user.usuarioId.isNotEmpty) {
+            options.headers['X-User-Id'] = user.usuarioId;
           }
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
           debugPrint('[ApiService Error] ${e.requestOptions.path}: ${e.message} (Status: ${e.response?.statusCode})');
 
-          // Manejo de 401: Token expirado o inválido -> Logout y redirigir
+          // Manejo de 401: Token expirado, inválido o sesión superada en otro dispositivo
           if (e.response?.statusCode == 401) {
-            await SessionService.logout();
+            final code = e.response?.data?['code']?.toString();
+            final serverMsg = e.response?.data?['message']?.toString();
+            String reason = 'Sesión finalizada. Por favor ingresa nuevamente.';
+            if (code == 'SESSION_SUPERSEDED') {
+              final dev = e.response?.data?['ultimo_dispositivo']?.toString() ?? 'otro dispositivo';
+              reason = 'Tu sesión ha sido abierta en $dev. Solo se permite una sesión activa por cuenta.';
+            } else if (serverMsg != null && serverMsg.isNotEmpty) {
+              reason = serverMsg;
+            }
+
+            await SessionService.logout(reason: reason);
             return handler.reject(
               DioException(
                 requestOptions: e.requestOptions,
                 error: UnauthorizedException(
-                  message: e.response?.data?['message']?.toString() ?? 'Sesión expirada. Por favor ingresa nuevamente.',
+                  message: reason,
                   data: e.response?.data,
                 ),
               ),
@@ -138,11 +154,47 @@ class ApiService {
     await SessionService.logout();
   }
 
+  /// Verifica si la sesión actual del dispositivo sigue activa o fue superada por otro dispositivo
+  Future<bool> verifySession() async {
+    final token = SessionService.token;
+    final user = SessionService.currentUser;
+    if (token == null || user == null) return false;
+
+    try {
+      final response = await _dio.get('/auth/verify-session');
+      return response.data?['active'] == true;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        return false;
+      }
+      return true;
+    } catch (_) {
+      return true;
+    }
+  }
+
   // ==========================================
   // 2. DASHBOARD E INDICADORES OFICIALES
   // ==========================================
 
-  /// Obtiene los 4 indicadores principales de Tesis (PODE, PEOR, PRS, TBPP)
+  /// Obtiene las 6 métricas operativas del "Resumen de la Jornada" de hoy
+  Future<ResumenJornadaModel> getResumenJornada() async {
+    try {
+      final response = await _dio.get('/dashboard/ejecutivo', queryParameters: {'dias': 1});
+      final data = response.data;
+      if (data != null && data['success'] == true && data['data'] != null) {
+        final d = data['data'] as Map<String, dynamic>;
+        if (d['resumen_hoy'] is Map<String, dynamic>) {
+          return ResumenJornadaModel.fromJson(d['resumen_hoy'] as Map<String, dynamic>);
+        }
+      }
+      return ResumenJornadaModel.fallback();
+    } catch (_) {
+      return ResumenJornadaModel.fallback();
+    }
+  }
+
+  /// Obtiene los indicadores principales de Tesis (POD, PRS, ITBPP)
   Future<DashboardIndicatorsResponse> getIndicators({
     String? mes,
     String? semana,
@@ -350,6 +402,10 @@ class ApiService {
                 accumulatedData.addAll(eventData);
               }
               if (onDone != null) onDone(accumulatedData);
+            } else if (eventType == 'ui_action') {
+              if (eventData is Map<String, dynamic>) {
+                accumulatedData['ui_action'] = eventData;
+              }
             } else if (eventType == 'error') {
               if (onError != null) onError(eventData);
             } else {

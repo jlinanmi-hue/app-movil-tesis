@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/user_model.dart';
 
@@ -8,8 +8,10 @@ class SessionService {
   static const String _keyUserData = 'auth_user_data';
   static const String _keyIsLoggedIn = 'auth_is_logged_in';
 
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   static final ValueNotifier<bool> isLoggedInNotifier = ValueNotifier<bool>(false);
   static final ValueNotifier<UserModel?> currentUserNotifier = ValueNotifier<UserModel?>(null);
+  static final ValueNotifier<String?> logoutReasonNotifier = ValueNotifier<String?>(null);
   static UserModel? _currentUser;
   static String? _cachedToken;
 
@@ -42,6 +44,7 @@ class SessionService {
     _currentUser = user;
     _cachedToken = token ?? user.token;
     currentUserNotifier.value = user;
+    logoutReasonNotifier.value = null;
 
     await prefs.setBool(_keyIsLoggedIn, true);
     if (_cachedToken != null) {
@@ -70,7 +73,7 @@ class SessionService {
   static bool get isLoggedIn => isLoggedInNotifier.value;
 
   /// Cierra la sesión y limpia el almacenamiento persistente
-  static Future<void> logout() async {
+  static Future<void> logout({String? reason}) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyIsLoggedIn);
     await prefs.remove(_keyToken);
@@ -79,6 +82,14 @@ class SessionService {
     _currentUser = null;
     _cachedToken = null;
     currentUserNotifier.value = null;
+    if (reason != null) {
+      logoutReasonNotifier.value = reason;
+    }
     isLoggedInNotifier.value = false;
+
+    // Retornar al inicio en caso de que hubiera rutas apiladas en el Navigator
+    try {
+      navigatorKey.currentState?.popUntil((route) => route.isFirst);
+    } catch (_) {}
   }
 }

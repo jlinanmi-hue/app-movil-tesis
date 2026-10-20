@@ -47,7 +47,7 @@ class UserModel {
       userName: (userObj['UsuarioUserName'] ?? userObj['username'] ?? 'admin').toString(),
       rol: userObj['rol']?.toString(),
       empleado: empObj != null ? EmpleadoModel.fromJson(empObj) : null,
-      token: token ?? json['token']?.toString(),
+      token: token ?? json['token']?.toString() ?? json['session_token']?.toString(),
     );
   }
 
