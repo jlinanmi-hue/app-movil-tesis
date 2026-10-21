@@ -90,7 +90,7 @@ class _RecepcionTabState extends State<RecepcionTab> {
       case 'Parciales':
         return e == 'RECEPCION_PARCIAL';
       case 'Cerradas':
-        return e.startsWith('CERRADA') || e == 'ANULADA';
+        return e.startsWith('CERRADA') || e == 'ANULADA' || e == 'RECHAZADA';
       default:
         return true;
     }
@@ -252,8 +252,8 @@ class _RecepcionTabState extends State<RecepcionTab> {
                         Text('Mercadería verificada',
                             style: TextStyle(
                                 fontSize: 9.5, color: AppColors.textMuted))
-                      else if (estado.contains('ANULADA'))
-                        Text('Orden anulada',
+                      else if (estado.contains('ANULADA') || estado.contains('RECHAZADA'))
+                        Text(estado.contains('RECHAZADA') ? 'Orden rechazada' : 'Orden anulada',
                             style: TextStyle(
                                 fontSize: 9.5, color: AppColors.textMuted)),
                     ],
@@ -333,9 +333,9 @@ class _RecepcionTabState extends State<RecepcionTab> {
         text: AppColors.successDark
       );
     }
-    if (s.contains('ANULADA')) {
+    if (s.contains('ANULADA') || s.contains('RECHAZADA')) {
       return (
-        label: 'Anulada',
+        label: s.contains('RECHAZADA') ? 'Rechazada' : 'Anulada',
         bg: AppColors.errorBg,
         border: AppColors.errorBorder,
         text: AppColors.errorDark
@@ -350,7 +350,7 @@ class _RecepcionTabState extends State<RecepcionTab> {
   }
 
   bool _esFinal(String estado) =>
-      estado.startsWith('CERRADA') || estado.contains('ANULADA');
+      estado.startsWith('CERRADA') || estado.contains('ANULADA') || estado.contains('RECHAZADA');
 
   // ---------------- desplegable por orden ----------------
 
