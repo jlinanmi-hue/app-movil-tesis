@@ -3,9 +3,11 @@ import '../../core/config/api_config.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/services/api_service.dart';
 import '../../core/services/session_service.dart';
+import '../../core/services/theme_service.dart';
 import '../../models/user_model.dart';
 import '../login/login_screen.dart';
 import '../login/widgets/server_config_dialog.dart';
+import '../../core/widgets/erp_ui.dart';
 import 'personal_data_screen.dart';
 import 'account_security_screen.dart';
 import 'user_role_info_screen.dart';
@@ -23,21 +25,21 @@ class _AccountScreenState extends State<AccountScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.logout_rounded, color: AppColors.error, size: 22),
             SizedBox(width: 8),
             Text('Cerrar Sesión', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
           ],
         ),
-        content: const Text(
+        content: Text(
           '¿Estás seguro de que deseas cerrar la sesión activa de Comercial Valencia?',
           style: TextStyle(fontSize: 13, color: AppColors.textDark),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar', style: TextStyle(color: AppColors.textSubtle)),
+            child: Text('Cancelar', style: TextStyle(color: AppColors.textSubtle)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -89,7 +91,7 @@ class _AccountScreenState extends State<AccountScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceLight,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
         child: Column(
@@ -101,15 +103,15 @@ class _AccountScreenState extends State<AccountScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCBD5E1),
+                  color: AppColors.celesteBg,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             const SizedBox(height: 18),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.info_outline_rounded, color: AppColors.primaryBlue, size: 22),
+                Icon(Icons.info_outline_rounded, color: AppColors.celesteDeep, size: 22),
                 SizedBox(width: 8),
                 Text(
                   'Acerca del Sistema',
@@ -118,11 +120,11 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Sistema de Información Híbrido con Inteligencia Artificial',
               style: TextStyle(fontSize: 12, color: AppColors.textSubtle),
             ),
-            const Divider(height: 24, color: AppColors.borderLight),
+            Divider(height: 24, color: AppColors.borderLight),
             _buildSystemRow('Aplicación', 'Comercial Valencia Móvil'),
             _buildSystemRow('Versión', '1.0.0 (Investigación Tesis)'),
             _buildSystemRow('Motor IA', 'Modelo LLM Empresarial (SSE & Audio)'),
@@ -141,7 +143,7 @@ class _AccountScreenState extends State<AccountScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceLight,
       builder: (ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 36),
         child: Column(
@@ -153,15 +155,15 @@ class _AccountScreenState extends State<AccountScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFCBD5E1),
+                  color: AppColors.celesteBg,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
             const SizedBox(height: 18),
-            const Row(
+            Row(
               children: [
-                Icon(Icons.smart_toy_outlined, color: Color(0xFF0F766E), size: 22),
+                Icon(Icons.smart_toy_outlined, color: AppColors.celesteDeep, size: 22),
                 SizedBox(width: 8),
                 Text(
                   'Valencia AI & Preferencias',
@@ -170,11 +172,11 @@ class _AccountScreenState extends State<AccountScreen> {
               ],
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               'Asistente Inteligente y Herramientas Operativas',
               style: TextStyle(fontSize: 12, color: AppColors.textSubtle),
             ),
-            const Divider(height: 24, color: AppColors.borderLight),
+            Divider(height: 24, color: AppColors.borderLight),
             _buildSystemRow('Estado del Asistente', 'En línea (Asistente IA)'),
             _buildSystemRow('Modo de Respuesta', 'Streaming Progresivo SSE'),
             _buildSystemRow('Transcriptor de Voz', 'Activo (Notas de Audio m4a/wav)'),
@@ -192,12 +194,12 @@ class _AccountScreenState extends State<AccountScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSubtle)),
+          Text(label, style: TextStyle(fontSize: 12, color: AppColors.textSubtle)),
           Flexible(
             child: Text(
               val,
               textAlign: TextAlign.end,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark),
             ),
           ),
         ],
@@ -219,41 +221,29 @@ class _AccountScreenState extends State<AccountScreen> {
             : 'CV';
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF8FAFC),
-          appBar: AppBar(
-            backgroundColor: AppColors.headerNavy,
-            elevation: 0,
-            title: const Text(
-              'Mi Cuenta',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            actions: [
-              // Botón Configuración de Servidor
-              IconButton(
-                onPressed: () => ServerConfigDialog.show(context).then((_) => setState(() {})),
-                icon: const Icon(Icons.settings_outlined, color: Colors.white, size: 20),
-                tooltip: 'Configuración de Servidor',
-              ),
-              // Botón de Editar Perfil con estilo cuadrado redondeado
-              Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: IconButton(
-                  onPressed: _abrirDatosPersonales,
-                  icon: Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
-                    ),
-                    child: const Icon(Icons.edit_rounded, color: Colors.white, size: 16),
+          backgroundColor: AppColors.backgroundLight,
+          body: Column(
+            children: [
+              ErpHeader(
+                title: 'Mi Cuenta',
+                showBack: false,
+                actions: [
+                  ErpCircleButton(
+                    icon: Icons.settings_outlined,
+                    tooltip: 'Configuración de Servidor',
+                    onTap: () => ServerConfigDialog.show(context)
+                        .then((_) => setState(() {})),
                   ),
-                  tooltip: 'Editar Perfil',
-                ),
+                  const SizedBox(width: 8),
+                  ErpCircleButton(
+                    icon: Icons.edit_rounded,
+                    tooltip: 'Editar Perfil',
+                    onTap: _abrirDatosPersonales,
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: SingleChildScrollView(
+              Expanded(
+                child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(18, 20, 18, 100),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -272,19 +262,11 @@ class _AccountScreenState extends State<AccountScreen> {
                             height: 90,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                colors: [Color(0xFF1A65FF), Color(0xFF0B132B)],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                              color: AppColors.celesteDeep,
+                              border: Border.all(
+                                color: AppColors.backgroundLight,
+                                width: 3.5,
                               ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF1A65FF).withValues(alpha: 0.3),
-                                  blurRadius: 18,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                              border: Border.all(color: Colors.white, width: 3.5),
                             ),
                             alignment: Alignment.center,
                             child: Text(
@@ -306,7 +288,10 @@ class _AccountScreenState extends State<AccountScreen> {
                               decoration: BoxDecoration(
                                 color: AppColors.successDark,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2.5),
+                                border: Border.all(
+                                  color: AppColors.backgroundLight,
+                                  width: 2.5,
+                                ),
                               ),
                             ),
                           ),
@@ -318,7 +303,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       Text(
                         nombreCompleto,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: AppColors.textDark,
@@ -331,7 +316,7 @@ class _AccountScreenState extends State<AccountScreen> {
                       Text(
                         '$cargo • Comercial Valencia',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
                           color: AppColors.textSubtle,
@@ -344,35 +329,37 @@ class _AccountScreenState extends State<AccountScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFBFDBFE)),
+                              color: AppColors.celesteTint,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: AppColors.celesteBg),
                             ),
                             child: Text(
                               empleado?.id ?? 'EMP-001',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryBlue,
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.celesteDeep,
+                                letterSpacing: .3,
                               ),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFCBD5E1)),
+                              color: AppColors.surfaceLight,
+                              borderRadius: BorderRadius.circular(5),
+                              border: Border.all(color: AppColors.hairline),
                             ),
                             child: Text(
                               '@${user?.userName ?? 'admin'}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF475569),
+                              style: TextStyle(
+                                fontSize: 10.5,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textMuted,
+                                letterSpacing: .3,
                               ),
                             ),
                           ),
@@ -387,80 +374,73 @@ class _AccountScreenState extends State<AccountScreen> {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(22),
-                    border: Border.all(color: AppColors.borderLight),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                        blurRadius: 14,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.hairline),
                   ),
                   child: Column(
                     children: [
                       // Opción 1: Datos del Colaborador (Exclusivo datos personales)
                       _buildMenuTile(
                         icon: Icons.person_outline_rounded,
-                        iconColor: AppColors.primaryBlue,
-                        iconBg: const Color(0xFFEFF6FF),
+                        iconColor: AppColors.celesteDeep,
+                        iconBg: AppColors.celesteTint,
                         title: 'Datos del Colaborador',
                         subtitle: 'Nombre, apellidos, DNI, teléfono y género',
                         onTap: _abrirDatosPersonales,
                       ),
-                      const Divider(height: 1, indent: 64, color: AppColors.borderLight),
+                      Divider(height: 1, indent: 64, color: AppColors.hairline),
 
                       // Opción 2: Seguridad & Contraseña (Exclusivo correo y password)
                       _buildMenuTile(
                         icon: Icons.lock_outline_rounded,
-                        iconColor: const Color(0xFF7C3AED),
-                        iconBg: const Color(0xFFF5F3FF),
+                        iconColor: AppColors.celesteDeep,
+                        iconBg: AppColors.celesteTint,
                         title: 'Seguridad & Contraseña',
                         subtitle: 'Actualización de correo y clave de acceso',
                         onTap: _abrirSeguridad,
                       ),
-                      const Divider(height: 1, indent: 64, color: AppColors.borderLight),
+                      Divider(height: 1, indent: 64, color: AppColors.hairline),
 
                       // Opción 3: Información del Usuario (Exclusivo rol, cargo y fecha de ingreso)
                       _buildMenuTile(
                         icon: Icons.badge_outlined,
-                        iconColor: const Color(0xFFD97706),
-                        iconBg: const Color(0xFFFEF3C7),
+                        iconColor: AppColors.celesteDeep,
+                        iconBg: AppColors.celesteTint,
                         title: 'Información del Usuario',
                         subtitle: 'Rol de acceso, cargo y fecha de ingreso',
                         onTap: _abrirInfoUsuario,
                       ),
-                      const Divider(height: 1, indent: 64, color: AppColors.borderLight),
+                      Divider(height: 1, indent: 64, color: AppColors.hairline),
 
                       // Opción 4: Infraestructura y Red (Servidor API)
                       _buildMenuTile(
                         icon: Icons.lan_outlined,
-                        iconColor: const Color(0xFF0284C7),
-                        iconBg: const Color(0xFFF0F9FF),
+                        iconColor: AppColors.celesteDeep,
+                        iconBg: AppColors.celesteTint,
                         title: 'Infraestructura y Red',
                         subtitle: ApiConfig.currentBaseUrl,
                         trailingBadge: 'Config',
                         onTap: () => ServerConfigDialog.show(context).then((_) => setState(() {})),
                       ),
-                      const Divider(height: 1, indent: 64, color: AppColors.borderLight),
+                      Divider(height: 1, indent: 64, color: AppColors.hairline),
 
                       // Opción 5: Valencia AI & Preferencias
                       _buildMenuTile(
                         icon: Icons.smart_toy_outlined,
-                        iconColor: const Color(0xFF0D9488),
-                        iconBg: const Color(0xFFF0FDFA),
+                        iconColor: AppColors.celesteDeep,
+                        iconBg: AppColors.celesteTint,
                         title: 'Valencia AI & Preferencias',
                         subtitle: 'Modelo LLM • Streaming & Audio',
                         onTap: _mostrarInfoAi,
                       ),
-                      const Divider(height: 1, indent: 64, color: AppColors.borderLight),
+                      Divider(height: 1, indent: 64, color: AppColors.hairline),
 
                       // Opción 6: Acerca del Sistema
                       _buildMenuTile(
                         icon: Icons.info_outline_rounded,
-                        iconColor: const Color(0xFF64748B),
-                        iconBg: const Color(0xFFF8FAFC),
+                        iconColor: AppColors.textMuted,
+                        iconBg: AppColors.celesteTint,
                         title: 'Acerca del Sistema',
                         subtitle: 'Versión 1.0.0 • Tesis Comercial Valencia',
                         onTap: _mostrarInfoSistema,
@@ -472,25 +452,83 @@ class _AccountScreenState extends State<AccountScreen> {
                 const SizedBox(height: 20),
 
                 // ==========================================
-                // 4. TARJETA CERRAR SESIÓN
+                // 4. APARIENCIA (MODO OSCURO)
                 // ==========================================
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: const Color(0xFFFEE2E2)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFEF4444).withValues(alpha: 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.hairline),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 10),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.celesteTint,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        alignment: Alignment.center,
+                        child: Icon(
+                          ThemeService.isDark
+                              ? Icons.dark_mode_rounded
+                              : Icons.light_mode_rounded,
+                          size: 20,
+                          color: AppColors.celesteDeep,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Apariencia',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Modo oscuro para ambientes con poca luz',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textSubtle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch(
+                        value: ThemeService.isDark,
+                        onChanged: (v) => ThemeService.setDark(v),
                       ),
                     ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // ==========================================
+                // 5. TARJETA CERRAR SESIÓN
+                // ==========================================
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.errorBorder),
                   ),
                   child: _buildMenuTile(
                     icon: Icons.logout_rounded,
                     iconColor: AppColors.error,
-                    iconBg: const Color(0xFFFEF2F2),
+                    iconBg: AppColors.errorBg,
                     title: 'Cerrar Sesión',
                     subtitle: 'Finalizar sesión activa en este dispositivo',
                     isDestructive: true,
@@ -499,6 +537,9 @@ class _AccountScreenState extends State<AccountScreen> {
                 ),
               ],
             ),
+          ),
+              ),
+            ],
           ),
         );
       },
@@ -567,13 +608,16 @@ class _AccountScreenState extends State<AccountScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  color: AppColors.celesteTint,
+                  borderRadius: BorderRadius.circular(5),
+                  border: Border.all(color: AppColors.celesteBg),
                 ),
                 child: Text(
                   trailingBadge,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primaryBlue),
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.celesteDeep),
                 ),
               ),
               const SizedBox(width: 6),
@@ -583,7 +627,7 @@ class _AccountScreenState extends State<AccountScreen> {
             Icon(
               Icons.chevron_right_rounded,
               size: 20,
-              color: isDestructive ? AppColors.error.withValues(alpha: 0.6) : const Color(0xFF94A3B8),
+              color: isDestructive ? AppColors.error.withValues(alpha: 0.6) : AppColors.textSubtle,
             ),
           ],
         ),

@@ -66,7 +66,7 @@ class ChatChartWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.fixedBorderLight),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -88,15 +88,15 @@ class ChatChartWidget extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Icon(Icons.bar_chart_rounded, size: 16, color: AppColors.primaryBlue),
+                Icon(Icons.bar_chart_rounded, size: 16, color: AppColors.primaryBlue),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AppColors.fixedTextDark,
                     ),
                   ),
                 ),
@@ -106,7 +106,7 @@ class ChatChartWidget extends StatelessWidget {
                     color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
+                  child: Text(
                     'IA',
                     style: TextStyle(
                       fontSize: 9.5,
@@ -134,10 +134,10 @@ class ChatChartWidget extends StatelessWidget {
                         Color(0xFF10B981),
                         Color(0xFF8B5CF6),
                       ],
-                      legend: const Legend(
+                      legend: Legend(
                         isVisible: true,
                         position: LegendPosition.bottom,
-                        textStyle: TextStyle(fontSize: 10, color: AppColors.textDark),
+                        textStyle: TextStyle(fontSize: 10, color: AppColors.fixedTextDark),
                       ),
                       series: <CircularSeries>[
                         DoughnutSeries<_ChatSeriesPoint, String>(
@@ -154,12 +154,12 @@ class ChatChartWidget extends StatelessWidget {
                   : isHorizontal
                       ? SfCartesianChart(
                           margin: EdgeInsets.zero,
-                          primaryXAxis: const CategoryAxis(
-                            labelStyle: TextStyle(fontSize: 9.5, color: AppColors.textSubtle),
+                          primaryXAxis: CategoryAxis(
+                            labelStyle: TextStyle(fontSize: 9.5, color: AppColors.fixedTextSubtle),
                           ),
                           primaryYAxis: NumericAxis(
                             labelFormat: isMoneda ? 'S/{value}' : '{value}',
-                            labelStyle: const TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                            labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                           ),
                           series: <CartesianSeries>[
                             BarSeries<_ChatSeriesPoint, String>(
@@ -178,12 +178,12 @@ class ChatChartWidget extends StatelessWidget {
                       : isArea
                           ? SfCartesianChart(
                               margin: EdgeInsets.zero,
-                              primaryXAxis: const CategoryAxis(
-                                labelStyle: TextStyle(fontSize: 9.5, color: AppColors.textSubtle),
+                              primaryXAxis: CategoryAxis(
+                                labelStyle: TextStyle(fontSize: 9.5, color: AppColors.fixedTextSubtle),
                               ),
                               primaryYAxis: NumericAxis(
                                 labelFormat: isMoneda ? 'S/{value}' : '{value}',
-                                labelStyle: const TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                                labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                               ),
                               series: <CartesianSeries>[
                                 AreaSeries<_ChatSeriesPoint, String>(
@@ -203,12 +203,12 @@ class ChatChartWidget extends StatelessWidget {
                           : isLine
                               ? SfCartesianChart(
                                   margin: EdgeInsets.zero,
-                                  primaryXAxis: const CategoryAxis(
-                                    labelStyle: TextStyle(fontSize: 9.5, color: AppColors.textSubtle),
+                                  primaryXAxis: CategoryAxis(
+                                    labelStyle: TextStyle(fontSize: 9.5, color: AppColors.fixedTextSubtle),
                                   ),
                                   primaryYAxis: NumericAxis(
                                     labelFormat: isMoneda ? 'S/{value}' : '{value}',
-                                    labelStyle: const TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                                    labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                                   ),
                                   series: <CartesianSeries>[
                                     LineSeries<_ChatSeriesPoint, String>(
@@ -223,12 +223,12 @@ class ChatChartWidget extends StatelessWidget {
                                 )
                               : SfCartesianChart(
                                   margin: EdgeInsets.zero,
-                                  primaryXAxis: const CategoryAxis(
-                                    labelStyle: TextStyle(fontSize: 9.5, color: AppColors.textSubtle),
+                                  primaryXAxis: CategoryAxis(
+                                    labelStyle: TextStyle(fontSize: 9.5, color: AppColors.fixedTextSubtle),
                                   ),
                                   primaryYAxis: NumericAxis(
                                     labelFormat: isMoneda ? 'S/{value}' : '{value}',
-                                    labelStyle: const TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                                    labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                                   ),
                                   series: <CartesianSeries>[
                                     ColumnSeries<_ChatSeriesPoint, String>(
@@ -258,16 +258,16 @@ class ChatChartWidget extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'Total acumulado: ',
-                    style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                    style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
                   ),
                   Text(
                     total,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textDark,
+                      color: AppColors.fixedTextDark,
                     ),
                   ),
                 ],

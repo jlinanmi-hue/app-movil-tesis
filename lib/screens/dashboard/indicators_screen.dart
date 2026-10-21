@@ -59,7 +59,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
 
   List<IndicatorItem> get _filteredIndicators {
     if (_indicators == null) return [];
-    final all = _indicators!.all;
+    final all = _indicators!.oficiales;
     if (_selectedFilter == 1) {
       return all.where(_checkCumple).toList();
     } else if (_selectedFilter == 2) {
@@ -70,7 +70,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
 
   int get _countCumple {
     if (_indicators == null) return 0;
-    return _indicators!.all.where(_checkCumple).length;
+    return _indicators!.oficiales.where(_checkCumple).length;
   }
 
   @override
@@ -148,18 +148,18 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
                   padding: const EdgeInsets.all(14),
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.errorBg,
+                    color: AppColors.fixedErrorBg,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.errorBorder),
+                    border: Border.all(color: AppColors.fixedErrorBorder),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 22),
+                      Icon(Icons.error_outline_rounded, color: AppColors.error, size: 22),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           _errorMessage!,
-                          style: const TextStyle(fontSize: 12, color: AppColors.errorDark, height: 1.3),
+                          style: TextStyle(fontSize: 12, color: AppColors.fixedErrorDark, height: 1.3),
                         ),
                       ),
                       TextButton(
@@ -258,7 +258,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
   // ---------------- HERO BANNER ----------------
   Widget _buildExecutiveHeroCard() {
     final cumple = _countCumple;
-    final total = _indicators?.all.length ?? 4;
+    final total = _indicators?.oficiales.length ?? 3;
     final pct = total > 0 ? ((cumple / total) * 100).toInt() : 100;
 
     return Container(
@@ -343,7 +343,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
           ),
           const SizedBox(height: 4),
           const Text(
-            'Evaluación pre/post implementación del sistema inteligente de comercialización y gestión de pedidos.',
+            'Evaluación pre/post de los 3 indicadores clave: POD, PRS e ITBPP con asistencia de IA.',
             style: TextStyle(
               fontSize: 12,
               color: Color(0xFF94A3B8),
@@ -355,29 +355,29 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
     );
   }
 
-  // ---------------- RESUMEN KPI EN CUADRÍCULA ----------------
+  // ---------------- RESUMEN KPI EN CUADRÍCULA (POD • PRS • ITBPP) ----------------
   Widget _buildKpiSummaryGrid() {
-    final all = _indicators!.all;
+    final all = _indicators!.oficiales;
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: all.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.65,
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 0.98,
       ),
       itemBuilder: (context, index) {
         final item = all[index];
         final isOk = _checkCumple(item);
-        final unit = item.id == 1 || item.id == 2 ? '%' : (item.id == 4 ? 's' : '');
+        final unit = item.sigla == 'ITBPP' ? 's' : '%';
 
         return InkWell(
           onTap: () => IndicatorDetailSheet.show(context, item, onRefreshParent: _loadData),
           borderRadius: BorderRadius.circular(16),
           child: Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
@@ -401,13 +401,13 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: const Color(0xFFE0F2FE),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        item.key.toUpperCase(),
+                        item.sigla,
                         style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
@@ -418,7 +418,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
                     ),
                     Icon(
                       isOk ? Icons.check_circle_rounded : Icons.warning_rounded,
-                      size: 16,
+                      size: 15,
                       color: isOk ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
                     ),
                   ],
@@ -426,20 +426,22 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
                 Text(
                   '${item.resultado.toStringAsFixed(1)}$unit',
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 17,
                     fontWeight: FontWeight.w900,
                     color: Color(0xFF0F172A),
-                    letterSpacing: -0.5,
+                    letterSpacing: -0.4,
                   ),
                 ),
                 Text(
-                  item.id == 1
+                  item.sigla == 'POD'
                       ? 'Meta: ≥ ${item.meta.toInt()}%'
-                      : (item.id == 4 ? 'Meta: ≤ ${item.meta.toInt()}s' : 'Meta: ≤ ${item.meta.toInt()}%'),
+                      : (item.sigla == 'ITBPP' ? 'Meta: ≤ ${item.meta.toInt()}s' : 'Meta: ≤ ${item.meta.toInt()}%'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 9.5,
                     color: Color(0xFF64748B),
+                    fontFamily: 'monospace',
                   ),
                 ),
               ],
@@ -453,7 +455,7 @@ class _IndicatorsScreenState extends State<IndicatorsScreen> {
   // ---------------- FILTROS DE ESTADO (CHIPS) ----------------
   Widget _buildFilterChips() {
     final cumple = _countCumple;
-    final total = _indicators?.all.length ?? 4;
+    final total = _indicators?.oficiales.length ?? 3;
     final alert = total - cumple;
 
     return SingleChildScrollView(

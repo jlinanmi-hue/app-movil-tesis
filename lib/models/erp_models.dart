@@ -44,6 +44,29 @@ class ErpItem {
     }
   }
 
+  /// Limpia y humaniza marcas temporales ISO crudas (evitando .000000Z, T, etc.)
+  /// Formato resultante: "19/10/2026 • 15:30" o la fecha limpia correspondiente.
+  static String formatDate(dynamic v) {
+    if (v == null) return '';
+    final s = '$v'.trim();
+    if (s.isEmpty || s == '—' || s == 'null') return '';
+    try {
+      final dt = DateTime.tryParse(s);
+      if (dt == null) {
+        return s.replaceAll(RegExp(r'\.?0+Z$'), '').replaceAll('T', ' ');
+      }
+      final local = dt.toLocal();
+      final d = local.day.toString().padLeft(2, '0');
+      final m = local.month.toString().padLeft(2, '0');
+      final y = local.year.toString();
+      final h = local.hour.toString().padLeft(2, '0');
+      final min = local.minute.toString().padLeft(2, '0');
+      return '$d/$m/$y • $h:$min';
+    } catch (_) {
+      return s;
+    }
+  }
+
   // ---------- CATEGORÍAS ----------
   factory ErpItem.fromCategoria(Map<String, dynamic> j) {
     return ErpItem(
@@ -107,17 +130,21 @@ class ErpItem {
 
   // ---------- CLIENTES ----------
   factory ErpItem.fromCliente(Map<String, dynamic> j) {
-    final compras = j['ClienteComprasCount'];
-    final total = j['ClienteTotalMonto'];
+    final doc = _s(j['ClienteRuc'] ?? j['ClienteDni'] ?? j['documento'] ?? j['ruc'], '');
+    final tel = _s(j['ClienteTelefono'] ?? j['ClienteNumero'] ?? j['telefono'] ?? j['celular'], '');
+    final dir = _s(j['ClienteDireccion'] ?? j['direccion'], '');
+
+    final datos = <String>[];
+    if (doc.isNotEmpty && doc != '—') datos.add(doc);
+    if (tel.isNotEmpty && tel != '—') datos.add('Tel: $tel');
+    if (dir.isNotEmpty && dir != '—') datos.add(dir);
+
     return ErpItem(
       id: _s(j['ClienteId'] ?? j['id'], '0'),
-      titulo: _s(j['ClienteNombre'], 'Cliente sin nombre'),
-      subtitulo:
-          '${_s(j['ClienteRuc'], 'Sin doc.')} • ${_s(j['ClienteDireccion'], 'Sin dirección')}',
-      monto: compras != null
-          ? '$compras compras${total != null ? ' • S/ $total' : ''}'
-          : _s(j['ClienteNumero'], ''),
-      estado: _estado(j['ClienteEstado']?.toString()),
+      titulo: _s(j['ClienteNombre'] ?? j['nombre'], 'Cliente sin nombre'),
+      subtitulo: datos.isNotEmpty ? datos.join(' • ') : 'Sin datos de contacto',
+      monto: '', // Solicitud: nada de compras y soles
+      estado: _estado(j['ClienteEstado']?.toString() ?? j['estado']?.toString()),
       progreso: 0.65,
       raw: j,
     );
@@ -184,14 +211,14 @@ class ErpItem {
     final cli = j['cliente'] is Map
         ? _s((j['cliente'] as Map)['nombre'], '')
         : _s(j['cliente_nombre'], '');
-    final fecha = _s(
-        j['fecha_formateada'] ?? j['PedidoFecha_pedido'], '');
+    final fechaRaw = j['fecha_formateada'] ?? j['PedidoFecha_pedido'] ?? j['fecha'] ?? j['created_at'];
+    final fecha = formatDate(fechaRaw);
     return ErpItem(
       id: _s(j['id'] ?? j['PedidoId'], '0'),
       titulo: _s(j['id'] ?? j['codigo'], 'Pedido'),
       subtitulo:
           '${cli.isNotEmpty && cli != '—' ? '$cli • ' : ''}$fecha${j['total_items'] != null ? ' • ${j['total_items']} ítems' : ''}',
-      monto: j['total'] != null ? 'S/ ${j['total']}' : '',
+      monto: j['total'] != null ? 'S/ ${j['total']}'.replaceAll('S/ S/ ', 'S/ ') : '',
       estado: _s(
           j['estado_texto'] ?? j['estado'] ?? j['PedidoEstado_pedido'],
           'pendiente'),
@@ -202,15 +229,24 @@ class ErpItem {
 
   // ---------- ÓRDENES COMPRA (OrdenCompraResource) ----------
   factory ErpItem.fromOrdenCompra(Map<String, dynamic> j) {
-    final prov = j['proveedor'] is Map
-        ? _s((j['proveedor'] as Map)['razon_social'], '')
-        : _s(j['proveedor_nombre'], '');
+    final provRaw = j['proveedor'];
+    String prov = '';
+    if (provRaw is Map) {
+      prov = _s(provRaw['razon_social'] ?? provRaw['nombre'] ?? provRaw['ProveedorRazonSocial'], '');
+    } else if (provRaw != null) {
+      prov = _s(provRaw, '');
+    }
+    if (prov.isEmpty || prov == '—') {
+      prov = _s(j['proveedor_nombre'], '');
+    }
+    final fechaRaw = j['fecha_formateada'] ?? j['fecha'] ?? j['created_at'];
+    final fecha = formatDate(fechaRaw);
     return ErpItem(
       id: _s(j['id'] ?? j['Orden_CompraId'], '0'),
       titulo: _s(j['id'] ?? j['codigo'], 'Orden'),
       subtitulo:
-          '${prov.isNotEmpty && prov != '—' ? '$prov • ' : ''}${_s(j['fecha_formateada'] ?? j['fecha'], '')}${j['total_items'] != null ? ' • ${j['total_items']} ítems' : ''}',
-      monto: j['total'] != null ? 'S/ ${j['total']}' : '',
+          '${prov.isNotEmpty && prov != '—' ? '$prov • ' : ''}$fecha${j['total_items'] != null ? ' • ${j['total_items']} ítems' : ''}',
+      monto: j['total'] != null ? 'S/ ${j['total']}'.replaceAll('S/ S/ ', 'S/ ') : '',
       estado: _s(j['estado_texto'] ?? j['estado'], 'pendiente'),
       progreso: 0.5,
       raw: j,
@@ -299,19 +335,200 @@ class ErpItem {
   factory ErpItem.fromAjuste(Map<String, dynamic> j) {
     final prod = j['producto'] is Map
         ? _s((j['producto'] as Map)['ProductoNombre'], '')
+        : _s(j['producto_nombre'] ?? j['producto'], '');
+
+    String prodNombre = (prod.isEmpty || prod == '—') ? '' : prod;
+    if (prodNombre.isEmpty && j['detalles'] is List && (j['detalles'] as List).isNotEmpty) {
+      final primerDetalle = (j['detalles'] as List).first;
+      if (primerDetalle is Map) {
+        prodNombre = _s(primerDetalle['producto_nombre'] ??
+            (primerDetalle['producto'] is Map
+                ? primerDetalle['producto']['ProductoNombre']
+                : null), '');
+        if (prodNombre == '—') prodNombre = '';
+      }
+    }
+
+    final tipoRaw = _s(j['Ajuste_inventario_tipo'] ?? j['tipo'], 'Ajuste');
+    final motivo = _s(j['Ajuste_inventario_motivo'] ?? j['motivo'] ?? j['observacion'], '');
+    final fechaRaw = j['Ajuste_inventario_fecha'] ?? j['fecha'] ?? j['created_at'];
+    final fechaFormateada = formatDate(fechaRaw);
+    final cant = j['Ajuste_inventario_cantidad'] ?? j['cantidad'];
+
+    final titulo = prodNombre.isNotEmpty
+        ? '$tipoRaw • $prodNombre'
+        : tipoRaw;
+
+    final subtituloPartes = <String>[];
+    if (motivo.isNotEmpty && motivo != '—') {
+      subtituloPartes.add(motivo);
+    }
+    if (fechaFormateada.isNotEmpty) {
+      subtituloPartes.add(fechaFormateada);
+    }
+    final subtitulo = subtituloPartes.isNotEmpty
+        ? subtituloPartes.join(' • ')
+        : (fechaFormateada.isNotEmpty ? fechaFormateada : 'Ajuste registrado');
+
+    final monto = cant != null
+        ? '${cant.toString().startsWith('-') ? '' : '-'}$cant uds.'
         : '';
+
+    String estado = tipoRaw.toLowerCase();
+    if (estado.contains('merma')) {
+      estado = 'merma';
+    } else if (estado.contains('daño') || estado.contains('dano')) {
+      estado = 'daño';
+    } else if (estado.contains('físico') || estado.contains('fisico') || estado.contains('anual')) {
+      estado = 'conteo';
+    } else {
+      estado = 'ajuste';
+    }
+
     return ErpItem(
       id: _s(j['Ajuste_inventario_id'] ?? j['id'], '0'),
-      titulo:
-          '${_s(j['Ajuste_inventario_tipo'], 'Ajuste')}${prod.isNotEmpty && prod != '—' ? ' • $prod' : ''}',
-      subtitulo:
-          '${_s(j['Ajuste_inventario_motivo'], '')} • ${_s(j['Ajuste_inventario_fecha'], '')}',
-      monto: j['Ajuste_inventario_cantidad'] != null
-          ? '-${j['Ajuste_inventario_cantidad']}'
-          : '',
-      estado: _s(j['Ajuste_inventario_tipo'], 'ajuste').toLowerCase(),
+      titulo: titulo,
+      subtitulo: subtitulo,
+      monto: monto,
+      estado: estado,
       progreso: 0.4,
       raw: j,
+    );
+  }
+}
+
+/// Datos oficiales de SUNAT / RENIEC devueltos por el backend, normalizados
+/// para autocompletar los formularios de cliente y proveedor.
+class SunatConsulta {
+  final String documento;
+  final bool esDni;
+  final bool desdeCache;
+  final String nombre;
+  final String direccion;
+  final String telefono;
+  final String estado; // 'A' activo · 'I' inactivo
+  final String estadoTexto; // ACTIVO / INACTIVO
+  final String condicion; // HABIDO / NO HABIDO...
+  final String tipoContribuyente;
+  final String nombreComercial;
+  final String actividadEconomica;
+  final String departamento;
+  final String provincia;
+  final String distrito;
+  final String ubigeo;
+
+  const SunatConsulta({
+    required this.documento,
+    required this.esDni,
+    required this.desdeCache,
+    required this.nombre,
+    required this.direccion,
+    required this.telefono,
+    required this.estado,
+    required this.estadoTexto,
+    required this.condicion,
+    required this.tipoContribuyente,
+    required this.nombreComercial,
+    required this.actividadEconomica,
+    required this.departamento,
+    required this.provincia,
+    required this.distrito,
+    required this.ubigeo,
+  });
+
+  bool get activo => estado == 'A';
+
+  /// Ubigeo en formato "Distrito - Provincia - Departamento".
+  String get ubicacion => [distrito, provincia, departamento]
+      .where((s) => s.isNotEmpty)
+      .join(' - ');
+
+  static String _txt(dynamic v) {
+    final s = v == null ? '' : '$v'.trim();
+    return (s == 'null' || s == 'undefined') ? '' : s;
+  }
+
+  static String _pick(List<dynamic> vals) {
+    for (final v in vals) {
+      final s = _txt(v);
+      if (s.isNotEmpty && s != '-' && s != '--') return s;
+    }
+    return '';
+  }
+
+  /// Normaliza el payload interno del endpoint `GET /sunat/ruc/{doc}`.
+  /// Soporta las variantes cliente / proveedor / all / DNI-RENIEC y la
+  /// ruta servida desde la caché BD del backend.
+  factory SunatConsulta.desdePayload(
+    Map<String, dynamic> payload,
+    String documento,
+    String target,
+  ) {
+    final raw = payload['raw_data'] is Map
+        ? Map<String, dynamic>.from(payload['raw_data'] as Map)
+        : <String, dynamic>{};
+    final inner = target == 'proveedor'
+        ? (payload['proveedor'] ?? payload['data'])
+        : (payload['cliente'] ?? payload['data']);
+    final obj =
+        inner is Map ? Map<String, dynamic>.from(inner) : <String, dynamic>{};
+
+    final nombre = _pick([
+      obj['ClienteNombre'], obj['ProveedorRazonSocial'],
+      payload['razon_social'], raw['razon_social'], raw['nombre'],
+      obj['nombre'], //
+    ]);
+    final direccion = _pick([
+      obj['ClienteDireccion'], obj['ProveedorDireccion'], obj['direccion'],
+      payload['direccion'], payload['direccion_completa'],
+      raw['direccion_fiscal'], raw['direccion'], //
+    ]);
+    final telefono = _pick([
+      obj['ClienteNumero'], obj['ProveedorTelefono'],
+      payload['telefono'], raw['telefono'], //
+    ]);
+    final estadoRaw = _pick([
+      obj['ClienteEstado'], obj['ProveedorEstado'],
+      payload['estado'], raw['estado'], //
+    ]).toUpperCase();
+    final estado = (estadoRaw == 'A' || estadoRaw == 'ACTIVO') ? 'A' : 'I';
+
+    String estadoTexto;
+    if (estadoRaw == 'ACTIVO' || estadoRaw == 'A') {
+      estadoTexto = 'ACTIVO';
+    } else if (estadoRaw == 'INACTIVO' || estadoRaw == 'I') {
+      estadoTexto = 'INACTIVO';
+    } else {
+      estadoTexto = estado == 'A' ? 'ACTIVO' : 'INACTIVO';
+    }
+
+    return SunatConsulta(
+      documento: documento.trim(),
+      esDni: documento.trim().length == 8,
+      desdeCache: payload['from_db'] == true,
+      nombre: nombre,
+      direccion: direccion,
+      telefono: telefono,
+      estado: estado,
+      estadoTexto: estadoTexto,
+      condicion: _pick([payload['condicion'], raw['condicion']]).toUpperCase(),
+      tipoContribuyente: _pick([
+        obj['ProveedorTipoContribuyente'], payload['tipo_contribuyente'],
+        raw['tipo_contribuyente'], //
+      ]),
+      nombreComercial: _pick([
+        obj['nombre_comercial'], payload['nombre_comercial'],
+        raw['nombre_comercial'], //
+      ]),
+      actividadEconomica: _pick([
+        obj['ProveedorActividadEconomica'], payload['actividad_economica'],
+        raw['actividad_economica'], //
+      ]),
+      departamento:
+          _pick([obj['departamento'], payload['departamento'], raw['departamento']]),
+      provincia: _pick([obj['provincia'], payload['provincia'], raw['provincia']]),
+      distrito: _pick([obj['distrito'], payload['distrito'], raw['distrito']]),
+      ubigeo: _pick([payload['ubigeo'], raw['ubigeo']]),
     );
   }
 }

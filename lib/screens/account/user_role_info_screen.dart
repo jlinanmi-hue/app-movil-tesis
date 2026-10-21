@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/services/session_service.dart';
+import '../../core/widgets/erp_ui.dart';
 
 class UserRoleInfoScreen extends StatelessWidget {
   const UserRoleInfoScreen({super.key});
@@ -18,20 +19,12 @@ class UserRoleInfoScreen extends StatelessWidget {
         : 'U';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: AppColors.headerNavy,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Información del Usuario',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          const ErpHeader(title: 'Información del Usuario'),
+          Expanded(
+            child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 40),
         child: Column(
           children: [
@@ -46,19 +39,8 @@ class UserRoleInfoScreen extends StatelessWidget {
                     height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF1A65FF), Color(0xFF0B132B)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF1A65FF).withValues(alpha: 0.25),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.white, width: 3),
+                      color: AppColors.celesteDeep,
+                      border: Border.all(color: AppColors.backgroundLight, width: 3),
                     ),
                     alignment: Alignment.center,
                     child: Text(
@@ -74,7 +56,7 @@ class UserRoleInfoScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     nombreCompleto,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textDark,
@@ -85,25 +67,26 @@ class UserRoleInfoScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBFDBFE)),
+                          color: AppColors.celesteTint,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: AppColors.celesteBg),
                         ),
                         child: Text(
                           empleado?.id ?? 'EMP-00001',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryBlue,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.celesteDeep,
+                            letterSpacing: .3,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '@${user?.userName ?? 'admin'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSubtle,
@@ -123,16 +106,9 @@ class UserRoleInfoScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFFDE68A)),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.04),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.warningBorder),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,13 +118,14 @@ class UserRoleInfoScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFEF3C7),
+                          color: AppColors.warningBg,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.lock_rounded, size: 18, color: Color(0xFFB45309)),
+                        child: Icon(Icons.lock_rounded,
+                            size: 18, color: AppColors.warningDark),
                       ),
                       const SizedBox(width: 10),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -157,7 +134,7 @@ class UserRoleInfoScreen extends StatelessWidget {
                           ),
                           Text(
                             'Administrado institucionalmente',
-                            style: TextStyle(fontSize: 11, color: Color(0xFFB45309), fontWeight: FontWeight.w600),
+                            style: TextStyle(fontSize: 11, color: AppColors.warningDark, fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
@@ -169,19 +146,19 @@ class UserRoleInfoScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFBEB),
+                      color: AppColors.celesteTint,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFFDE68A)),
+                      border: Border.all(color: AppColors.celesteBg),
                     ),
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFFD97706)),
+                        Icon(Icons.info_outline_rounded, size: 16, color: AppColors.celesteDeep),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Por políticas de seguridad, tu Rol y Cargo no pueden ser alterados desde tu cuenta. Solo el Administrador puede reasignarlos.',
-                            style: TextStyle(fontSize: 11, color: Color(0xFF92400E), height: 1.35),
+                            style: TextStyle(fontSize: 11, color: AppColors.textDark, height: 1.35),
                           ),
                         ),
                       ],
@@ -226,21 +203,14 @@ class UserRoleInfoScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: AppColors.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.hairline),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Identidad en la Organización',
                     style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textDark),
                   ),
@@ -258,6 +228,9 @@ class UserRoleInfoScreen extends StatelessWidget {
           ],
         ),
       ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -270,13 +243,13 @@ class UserRoleInfoScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
+        color: AppColors.celesteTint,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 20, color: const Color(0xFF475569)),
+          Icon(icon, size: 20, color: AppColors.celesteDeep),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -284,12 +257,12 @@ class UserRoleInfoScreen extends StatelessWidget {
               children: [
                 Text(
                   label,
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+                  style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700, color: AppColors.textDark),
                 ),
               ],
             ),
@@ -297,18 +270,18 @@ class UserRoleInfoScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              color: AppColors.surfaceLight,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: AppColors.hairline),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.lock_rounded, size: 11, color: Color(0xFF94A3B8)),
+                Icon(Icons.lock_rounded, size: 11, color: AppColors.textSubtle),
                 const SizedBox(width: 4),
                 Text(
                   badgeText,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -322,8 +295,8 @@ class UserRoleInfoScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: AppColors.textSubtle)),
-        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark)),
+        Text(label, style: TextStyle(fontSize: 12, color: AppColors.textSubtle)),
+        Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textDark)),
       ],
     );
   }

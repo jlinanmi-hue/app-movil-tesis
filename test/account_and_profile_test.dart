@@ -159,7 +159,7 @@ void main() {
     expect(find.text('Rol y Cargo Asignados'), findsNothing);
 
     // Regresar
-    await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
 
     // 2. Navegar a Seguridad & Contraseña
@@ -169,7 +169,7 @@ void main() {
     expect(find.text('Mis Datos Personales'), findsNothing);
 
     // Regresar
-    await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
+    await tester.tap(find.byIcon(Icons.arrow_back_rounded));
     await tester.pumpAndSettle();
 
     // 3. Navegar a Información del Usuario

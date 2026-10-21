@@ -1,28 +1,22 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
   static const String _keyCustomBaseUrl = 'custom_api_base_url';
+  static const String _keyConfigVersion = 'api_base_url_version';
+  static const int _configVersion = 2;
 
-  // URLs predeterminadas según entorno
+  // Backend oficial desplegado en Render.
+  static const String productionUrl = 'https://backend-tesis-xu33.onrender.com/api';
+
+  // URLs locales para desarrollo o pruebas (configurables manualmente).
   static const String emulatorAndroidUrl = 'http://10.0.2.2:8000/api';
   static const String localhostUrl = 'http://127.0.0.1:8000/api';
 
   static String _cachedBaseUrl = '';
 
-  /// Obtiene la URL base por defecto según la plataforma
-  static String get defaultBaseUrl {
-    if (kIsWeb) {
-      return localhostUrl;
-    }
-    try {
-      if (Platform.isAndroid) {
-        return emulatorAndroidUrl;
-      }
-    } catch (_) {}
-    return localhostUrl;
-  }
+  /// URL base por defecto: backend oficial en Render.
+  static String get defaultBaseUrl => productionUrl;
 
   /// Obtiene de forma síncrona la URL base actual (o la predeterminada)
   static String get currentBaseUrl => _cachedBaseUrl.isNotEmpty ? _cachedBaseUrl : defaultBaseUrl;
@@ -33,6 +27,17 @@ class ApiConfig {
       return _cachedBaseUrl;
     }
     final prefs = await SharedPreferences.getInstance();
+
+    // Migración única: el backend cambió de dominio. Se descarta cualquier
+    // URL guardada por versiones anteriores para que la app use la nueva.
+    final version = prefs.getInt(_keyConfigVersion) ?? 1;
+    if (version < _configVersion) {
+      await prefs.remove(_keyCustomBaseUrl);
+      await prefs.setInt(_keyConfigVersion, _configVersion);
+      _cachedBaseUrl = defaultBaseUrl;
+      return _cachedBaseUrl;
+    }
+
     final saved = prefs.getString(_keyCustomBaseUrl);
     if (saved != null && saved.trim().isNotEmpty) {
       _cachedBaseUrl = _normalizeUrl(saved.trim());
@@ -47,6 +52,7 @@ class ApiConfig {
     final normalized = _normalizeUrl(url.trim());
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyCustomBaseUrl, normalized);
+    await prefs.setInt(_keyConfigVersion, _configVersion);
     _cachedBaseUrl = normalized;
   }
 
@@ -54,8 +60,13 @@ class ApiConfig {
   static Future<void> resetToDefault() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_keyCustomBaseUrl);
+    await prefs.setInt(_keyConfigVersion, _configVersion);
     _cachedBaseUrl = defaultBaseUrl;
   }
+
+  /// Solo para pruebas: descarta la URL en memoria para simular un arranque.
+  @visibleForTesting
+  static void resetCache() => _cachedBaseUrl = '';
 
   static String _normalizeUrl(String url) {
     var result = url;

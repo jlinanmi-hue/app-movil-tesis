@@ -22,7 +22,11 @@ class DashboardIndicatorsResponse {
     );
   }
 
+  /// Retorna todos los indicadores del payload (para compatibilidad de serialización)
   List<IndicatorItem> get all => [pode, peor, prs, tbpp];
+
+  /// Únicamente los 3 indicadores oficiales que maneja la web: POD, PRS e ITBPP
+  List<IndicatorItem> get oficiales => [pode, prs, tbpp];
 }
 
 class IndicatorItem {
@@ -50,26 +54,40 @@ class IndicatorItem {
     this.anterior,
   });
 
+  /// Sigla oficial de tesis: POD, PRS o ITBPP
+  String get sigla {
+    switch (key.toLowerCase()) {
+      case 'pode':
+        return 'POD';
+      case 'prs':
+        return 'PRS';
+      case 'tbpp':
+        return 'ITBPP';
+      default:
+        return key.toUpperCase();
+    }
+  }
+
   factory IndicatorItem.fromJson(int id, String key, Map<String, dynamic> json) {
     final titles = {
-      'pode': 'Porcentaje de Órdenes Despachadas Exitosamente',
-      'peor': 'Tasa de Error en Procesamiento',
-      'prs': 'Incidentes de Rotura de Stock Semanal',
-      'tbpp': 'Tiempo de Búsqueda Promedio por Pedido',
+      'pode': 'Órdenes Despachadas con Éxito (POD)',
+      'peor': 'Tasa de Error en Procesamiento (PEOR)',
+      'prs': 'Quiebres de Stock Semanales (PRS)',
+      'tbpp': 'Tiempo de Registro por Pedido (ITBPP)',
     };
 
     final subtitles = {
-      'pode': 'Meta vs. Actual',
-      'peor': 'Tendencia Semanal',
-      'prs': 'Buscando llegar a cero',
-      'tbpp': 'Optimización con Asistente IA',
+      'pode': 'Cumplimiento general de entrega',
+      'peor': 'Precisión y captura sin fallos',
+      'prs': 'Incidencias por falta de inventario',
+      'tbpp': 'Agilidad de atención con asistencia IA',
     };
 
     final defaultMetas = {
       'pode': 95.0,
-      'peor': 3.0,
-      'prs': 5.0,
-      'tbpp': 10.0,
+      'peor': 2.0,
+      'prs': 3.0,
+      'tbpp': 40.0,
     };
 
     return IndicatorItem(

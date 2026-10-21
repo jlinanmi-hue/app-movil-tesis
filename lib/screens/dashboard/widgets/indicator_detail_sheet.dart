@@ -86,7 +86,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                 height: 4,
                 margin: const EdgeInsets.only(top: 10, bottom: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.borderLight,
+                  color: AppColors.fixedBorderLight,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -108,10 +108,10 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                               Flexible(
                                 child: Text(
                                   widget.indicator.titulo,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color: AppColors.textDark,
+                                    color: AppColors.fixedTextDark,
                                   ),
                                 ),
                               ),
@@ -125,7 +125,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                                   ),
                                   child: Text(
                                     widget.indicator.formula!,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       fontFamily: 'monospace',
@@ -138,7 +138,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                           const SizedBox(height: 2),
                           Text(
                             'Medición de Tesis • ${widget.indicator.frecuencia ?? 'Mensual'} • Meta: ${widget.indicator.meta.toInt()}${widget.indicator.id == 4 ? 's' : '%'}',
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                            style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
                           ),
                         ],
                       ),
@@ -150,15 +150,15 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   ],
                 ),
               ),
-              const Divider(height: 1, color: AppColors.borderLight),
+              Divider(height: 1, color: AppColors.fixedBorderLight),
 
               // Barra de Filtro de Canales
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                color: AppColors.surfaceMuted,
+                color: AppColors.fixedSurfaceMuted,
                 child: Row(
                   children: [
-                    const Text('Canal: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textMuted)),
+                    Text('Canal: ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.fixedTextMuted)),
                     Expanded(
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
@@ -178,14 +178,14 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   ],
                 ),
               ),
-              const Divider(height: 1, color: AppColors.borderLight),
+              Divider(height: 1, color: AppColors.fixedBorderLight),
 
               // ==========================================
               // CONTENIDO DE SUBGRÁFICOS ANALÍTICOS
               // ==========================================
               Expanded(
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -193,7 +193,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                             SizedBox(height: 12),
                             Text(
                               'Calculando subgráficos analíticos en SQL Server...',
-                              style: TextStyle(fontSize: 11, color: AppColors.textMuted),
+                              style: TextStyle(fontSize: 11, color: AppColors.fixedTextMuted),
                             ),
                           ],
                         ),
@@ -302,11 +302,11 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
               child: funnelData.isEmpty
                   ? _buildEmpty()
                   : SfFunnelChart(
-                      legend: const Legend(
+                      legend: Legend(
                         isVisible: true,
                         position: LegendPosition.bottom,
                         overflowMode: LegendItemOverflowMode.wrap,
-                        textStyle: TextStyle(fontSize: 10.5, color: AppColors.textDark),
+                        textStyle: TextStyle(fontSize: 10.5, color: AppColors.fixedTextDark),
                       ),
                       tooltipBehavior: TooltipBehavior(enable: true, format: 'point.x: point.y pedidos'),
                       series: FunnelSeries<_FunnelData, String>(
@@ -336,9 +336,9 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                         ),
                         child: Column(
                           children: [
-                            Text(d.etapa, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9, color: AppColors.textSubtle)),
-                            Text('${d.valor.toInt()} ped.', style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.textDark)),
-                            Text('${d.porcentaje.toInt()}%', style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
+                            Text(d.etapa, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle)),
+                            Text('${d.valor.toInt()} ped.', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark)),
+                            Text('${d.porcentaje.toInt()}%', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primaryBlue)),
                           ],
                         ),
                       ),
@@ -428,7 +428,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   borderWidth: 2,
                   dashArray: const <double>[5, 5],
                   text: 'Meta SLA: ≤ 15 min',
-                  textStyle: const TextStyle(color: AppColors.error, fontSize: 10, fontWeight: FontWeight.bold),
+                  textStyle: TextStyle(color: AppColors.error, fontSize: 10, fontWeight: FontWeight.bold),
                   horizontalTextAlignment: TextAnchor.end,
                 ),
               ],
@@ -554,11 +554,11 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
           child: typesData.isEmpty
               ? _buildEmpty()
               : SfCircularChart(
-                  legend: const Legend(
+                  legend: Legend(
                     isVisible: true,
                     position: LegendPosition.bottom,
                     overflowMode: LegendItemOverflowMode.wrap,
-                    textStyle: TextStyle(fontSize: 10.5, color: AppColors.textDark),
+                    textStyle: TextStyle(fontSize: 10.5, color: AppColors.fixedTextDark),
                   ),
                   tooltipBehavior: TooltipBehavior(enable: true, format: 'point.x: point.y incidencias'),
                   series: <CircularSeries>[
@@ -602,10 +602,10 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                     yValueMapper: (_CategoryColorData d, _) => d.value,
                     pointColorMapper: (_CategoryColorData d, _) => d.color,
                     dataLabelMapper: (_CategoryColorData d, _) => d.text,
-                    dataLabelSettings: const DataLabelSettings(
+                    dataLabelSettings: DataLabelSettings(
                       isVisible: true,
                       labelPosition: ChartDataLabelPosition.outside,
-                      textStyle: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                      textStyle: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark),
                     ),
                     borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
                   ),
@@ -626,11 +626,11 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.smart_toy_rounded, size: 14, color: AppColors.primaryBlue),
+                        Icon(Icons.smart_toy_rounded, size: 14, color: AppColors.primaryBlue),
                         const SizedBox(width: 4),
                         Text(
                           'Valencia AI: ${iaItem.value.toInt()} errores (${iaItem.value.toInt() == 0 ? '100% precisión' : iaItem.text})',
-                          style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.primaryBlue),
+                          style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.primaryBlue),
                         ),
                       ],
                     ),
@@ -744,8 +744,8 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                 pointers: <GaugePointer>[
                   NeedlePointer(
                     value: resolutionVal,
-                    needleColor: AppColors.textDark,
-                    knobStyle: const KnobStyle(color: AppColors.textDark, knobRadius: 0.08),
+                    needleColor: AppColors.fixedTextDark,
+                    knobStyle: KnobStyle(color: AppColors.fixedTextDark, knobRadius: 0.08),
                     needleLength: 0.72,
                     needleEndWidth: 4,
                   ),
@@ -757,7 +757,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                       children: [
                         Text(
                           '${resolutionVal.toStringAsFixed(1)} min',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 3),
@@ -808,21 +808,21 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.successBg,
+                      color: AppColors.fixedSuccessBg,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.successBorder),
+                      border: Border.all(color: AppColors.fixedSuccessBorder),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.thumb_up_rounded, size: 16, color: AppColors.successDark),
+                        Icon(Icons.thumb_up_rounded, size: 16, color: AppColors.fixedSuccessDark),
                         const SizedBox(width: 6),
                         Text(
                           '$likes Likes (${tasaAcierto.toStringAsFixed(1)}%)',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.successDark,
+                            color: AppColors.fixedSuccessDark,
                           ),
                         ),
                       ],
@@ -834,21 +834,21 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.errorBg,
+                      color: AppColors.fixedErrorBg,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.errorBorder),
+                      border: Border.all(color: AppColors.fixedErrorBorder),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.thumb_down_rounded, size: 16, color: AppColors.errorDark),
+                        Icon(Icons.thumb_down_rounded, size: 16, color: AppColors.fixedErrorDark),
                         const SizedBox(width: 6),
                         Text(
                           '$dislikes Dislikes',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.errorDark,
+                            color: AppColors.fixedErrorDark,
                           ),
                         ),
                       ],
@@ -859,18 +859,18 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
             ),
             const SizedBox(height: 14),
 
-            const Text(
+            Text(
               'TASA DE PRECISIÓN POR HERRAMIENTA / TOOL',
-              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextMuted),
             ),
             const SizedBox(height: 8),
 
             if (byToolRaw.isEmpty)
-              const Padding(
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   'Aún no se registran evaluaciones por herramienta en este mes.',
-                  style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                  style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
                 ),
               )
             else
@@ -883,9 +883,9 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                   padding: const EdgeInsets.all(10),
                   margin: const EdgeInsets.only(bottom: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceMuted,
+                    color: AppColors.fixedSurfaceMuted,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.borderLight),
+                    border: Border.all(color: AppColors.fixedBorderLight),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -895,23 +895,23 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                         children: [
                           Text(
                             toolName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'monospace',
-                              color: AppColors.textDark,
+                              color: AppColors.fixedTextDark,
                             ),
                           ),
                           Text(
                             '$total evaluaciones registradas',
-                            style: const TextStyle(fontSize: 10, color: AppColors.textSubtle),
+                            style: TextStyle(fontSize: 10, color: AppColors.fixedTextSubtle),
                           ),
                         ],
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: acierto >= 90 ? AppColors.successBg : AppColors.warningBg,
+                          color: acierto >= 90 ? AppColors.fixedSuccessBg : AppColors.fixedWarningBg,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -919,7 +919,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                           style: TextStyle(
                             fontSize: 10.5,
                             fontWeight: FontWeight.bold,
-                            color: acierto >= 90 ? AppColors.successDark : AppColors.warningDark,
+                            color: acierto >= 90 ? AppColors.fixedSuccessDark : AppColors.fixedWarningDark,
                           ),
                         ),
                       ),
@@ -1031,11 +1031,11 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
           child: catData.isEmpty
               ? _buildEmpty()
               : SfCircularChart(
-                  legend: const Legend(
+                  legend: Legend(
                     isVisible: true,
                     position: LegendPosition.bottom,
                     overflowMode: LegendItemOverflowMode.wrap,
-                    textStyle: TextStyle(fontSize: 10.5, color: AppColors.textDark),
+                    textStyle: TextStyle(fontSize: 10.5, color: AppColors.fixedTextDark),
                   ),
                   tooltipBehavior: TooltipBehavior(enable: true, format: 'point.x: point.y quiebres'),
                   series: <CircularSeries>[
@@ -1168,11 +1168,11 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                         maximum: 3.5,
                         interval: 1.0,
                         axisLabelFormatter: (AxisLabelRenderDetails details) {
-                          return ChartAxisLabel('${details.value.toInt()} ítems', const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.textDark));
+                          return ChartAxisLabel('${details.value.toInt()} ítems', TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark));
                         },
                         title: const AxisTitle(text: 'Tamaño del Pedido', textStyle: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                       ),
-                      primaryYAxis: const NumericAxis(
+                      primaryYAxis: NumericAxis(
                         minimum: 0,
                         maximum: 12,
                         interval: 2,
@@ -1318,7 +1318,7 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
                 dataSource: idealList,
                 xValueMapper: (_ChartData d, _) => d.x,
                 yValueMapper: (_ChartData d, _) => d.y,
-                color: AppColors.textSubtle,
+                color: AppColors.fixedTextSubtle,
                 dashArray: const <double>[4, 4],
                 markerSettings: const MarkerSettings(isVisible: true, shape: DataMarkerType.diamond, width: 5, height: 5),
                 dataLabelSettings: const DataLabelSettings(isVisible: true, textStyle: TextStyle(fontSize: 9)),
@@ -1339,21 +1339,21 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: AppColors.fixedSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.fixedBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.textDark),
+            style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark),
           ),
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: const TextStyle(fontSize: 10.5, color: AppColors.textSubtle),
+            style: TextStyle(fontSize: 10.5, color: AppColors.fixedTextSubtle),
           ),
           const SizedBox(height: 12),
           child,
@@ -1370,14 +1370,14 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.insights_rounded, size: 16, color: AppColors.primaryBlue),
+                Icon(Icons.insights_rounded, size: 16, color: AppColors.primaryBlue),
                 const SizedBox(width: 8),
                 Expanded(
                   child: RichText(
                     text: TextSpan(
-                      style: const TextStyle(fontSize: 11, color: AppColors.textDark, height: 1.35),
+                      style: TextStyle(fontSize: 11, color: AppColors.fixedTextDark, height: 1.35),
                       children: [
-                        const TextSpan(
+                        TextSpan(
                           text: 'Interpretación: ',
                           style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryBlue),
                         ),
@@ -1406,14 +1406,14 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
       labelStyle: TextStyle(
         fontSize: 10.5,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        color: isSelected ? AppColors.primaryBlue : AppColors.textMuted,
+        color: isSelected ? AppColors.primaryBlue : AppColors.fixedTextMuted,
       ),
       selectedColor: const Color(0xFFEFF6FF),
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: isSelected ? const Color(0xFFBFDBFE) : AppColors.borderLight,
+          color: isSelected ? const Color(0xFFBFDBFE) : AppColors.fixedBorderLight,
         ),
       ),
       showCheckmark: false,
@@ -1441,10 +1441,10 @@ class _IndicatorDetailSheetState extends State<IndicatorDetailSheet> {
   }
 
   Widget _buildEmpty() {
-    return const Center(
+    return Center(
       child: Text(
         'Sin datos para el período seleccionado',
-        style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+        style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
       ),
     );
   }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/widgets/erp_ui.dart';
+import 'erp_history_screen.dart';
 
 /// Campo configurable para formularios móviles (crear/editar).
 class ErpField {
@@ -50,9 +52,9 @@ class ErpFormSheet extends StatefulWidget {
     final saved = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.surfaceLight,
       shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: ErpFormSheet(
@@ -113,21 +115,16 @@ class _ErpFormSheetState extends State<ErpFormSheet> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                        child: Container(
-                            width: 38,
-                            height: 4,
-                            decoration: BoxDecoration(
-                                color: AppColors.celesteBg,
-                                borderRadius: BorderRadius.circular(2)))),
-                    const SizedBox(height: 14),
+                    const ErpDragHandle(),
+                    const SizedBox(height: 16),
                     Text(widget.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.textDark)),
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.textDark,
+                            letterSpacing: -0.3)),
                     const SizedBox(height: 4),
-                    const Text('Completa los campos para guardar el registro.',
+                    Text('Completa los campos para guardar el registro.',
                         style: TextStyle(
                             fontSize: 11.5, color: AppColors.textMuted)),
                     const SizedBox(height: 14),
@@ -149,26 +146,11 @@ class _ErpFormSheetState extends State<ErpFormSheet> {
                     else
                       ...widget.fields.map(_field),
                     const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _saving ? null : _save,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.celeste,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14)),
-                        ),
-                        child: _saving
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white))
-                            : const Text('Guardar registro',
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
+                    ErpPrimaryButton(
+                      label: 'Guardar registro',
+                      icon: Icons.save_outlined,
+                      loading: _saving,
+                      onTap: _saving ? null : _save,
                     ),
                   ],
                 ),
@@ -211,14 +193,6 @@ class _ErpFormSheetState extends State<ErpFormSheet> {
           decoration: InputDecoration(
             labelText: f.label + (f.required ? ' *' : ''),
             hintText: f.hint ?? (raw != null ? 'Actual: $raw' : null),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppColors.celesteBg)),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14),
-                borderSide: const BorderSide(color: AppColors.celesteBg)),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           ),
           items: opts
               .map((o) => DropdownMenuItem(value: o, child: Text(o)))
@@ -242,14 +216,6 @@ class _ErpFormSheetState extends State<ErpFormSheet> {
         decoration: InputDecoration(
           labelText: f.label + (f.required ? ' *' : ''),
           hintText: f.hint,
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.celesteBg)),
-          enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.celesteBg)),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         ),
         validator: (v) {
           if (f.required && (v == null || v.trim().isEmpty)) {
@@ -306,105 +272,25 @@ class ErpHistoryTable extends StatelessWidget {
     required List<String> columns,
     required List<List<String>> rows,
   }) {
-    return showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.85,
-        maxChildSize: 0.95,
-        builder: (_, ctrl) => ErpHistoryTable(
-            title: title, columns: columns, rows: rows),
+    return Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ErpHistoryScreen(
+          title: title,
+          columns: columns,
+          initialRows: rows,
+          incrustado: false,
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-                child: Container(
-                    width: 38,
-                    height: 4,
-                    decoration: BoxDecoration(
-                        color: AppColors.celesteBg,
-                        borderRadius: BorderRadius.circular(2)))),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(title,
-                      style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.textDark)),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.celesteTint,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text('${rows.length} filas',
-                      style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.celesteDark)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: rows.isEmpty
-                  ? const Center(
-                      child: Text('Sin historial por ahora.',
-                          style: TextStyle(color: AppColors.textMuted)))
-                  : LayoutBuilder(
-                      builder: (context, c) => SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minWidth: c.maxWidth),
-                            child: DataTable(
-                              headingRowColor:
-                                  WidgetStateProperty.all(
-                                      AppColors.celesteTint),
-                              headingTextStyle: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.celesteDark),
-                              dataTextStyle: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: AppColors.textDark),
-                              columns: columns
-                                  .map((h) => DataColumn(label: Text(h)))
-                                  .toList(),
-                              rows: rows
-                                  .map((r) => DataRow(
-                                      cells: r
-                                          .map((v) => DataCell(Text(v)))
-                                          .toList()))
-                                  .toList(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-            ),
-          ],
-        ),
-      ),
+    return ErpHistoryScreen(
+      title: title,
+      columns: columns,
+      initialRows: rows,
+      incrustado: true,
     );
   }
 }

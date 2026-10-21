@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
+import 'erp_ui.dart';
 
-/// UI Kit estilo Campus Cash pero solo CELESTE + BLANCO.
-/// Cards rounded 20-24, sombras suaves, progress bars, filas tipo lista.
+/// UI Kit propio (CELESTE + BLANCO): cards suaves, filas tipo lista.
 
 class CampusCard extends StatelessWidget {
   final Widget child;
@@ -21,19 +21,12 @@ class CampusCard extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: highlighted ? AppColors.celeste : AppColors.celesteBg,
-          width: highlighted ? 1.6 : 1,
+          color: highlighted ? AppColors.celesteDark : AppColors.hairline,
+          width: highlighted ? 1.5 : 1,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.celesteDark.withValues(alpha: 0.07),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: child,
     );
@@ -64,19 +57,8 @@ class CampusHeroCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0A3642), AppColors.celesteDark],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.celesteDark.withValues(alpha: 0.28),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
+        color: AppColors.celesteDeep,
+        borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       child: Row(
         children: [
@@ -113,18 +95,18 @@ class CampusHeroCard extends StatelessWidget {
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(actionLabel,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: AppColors.celesteDark)),
                           const SizedBox(width: 4),
-                          const Icon(Icons.arrow_forward_rounded,
+                          Icon(Icons.arrow_forward_rounded,
                               size: 13, color: AppColors.celesteDark),
                         ],
                       ),
@@ -139,7 +121,7 @@ class CampusHeroCard extends StatelessWidget {
             height: 64,
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(12),
               border:
                   Border.all(color: Colors.white.withValues(alpha: 0.25)),
             ),
@@ -177,7 +159,6 @@ class CampusListRow extends StatelessWidget {
   final String subtitle;
   final String trailing;
   final String? badge;
-  final double? progress;
   final VoidCallback? onTap;
 
   const CampusListRow({
@@ -187,7 +168,6 @@ class CampusListRow extends StatelessWidget {
     required this.subtitle,
     required this.trailing,
     this.badge,
-    this.progress,
     this.onTap,
   });
 
@@ -203,124 +183,123 @@ class CampusListRow extends StatelessWidget {
         b.contains('aprob') ||
         b.contains('despach') ||
         b.contains('entreg')) {
-      badgeBg = const Color(0xFFECFDF5);
-      badgeFg = const Color(0xFF059669);
-      badgeBorder = const Color(0xFFA7F3D0);
+      badgeBg = AppColors.successBg;
+      badgeFg = AppColors.successDark;
+      badgeBorder = AppColors.successBorder;
     } else if (b.contains('pend') ||
         b.contains('proceso') ||
         b.contains('valid') ||
         b.contains('prep')) {
-      badgeBg = const Color(0xFFFFFBEB);
-      badgeFg = const Color(0xFFD97706);
-      badgeBorder = const Color(0xFFFDE68A);
+      badgeBg = AppColors.warningBg;
+      badgeFg = AppColors.warningDark;
+      badgeBorder = AppColors.warningBorder;
     } else if (b.contains('inactiv') ||
         b.contains('anul') ||
         b.contains('cancel') ||
         b.contains('elimin') ||
         b.contains('riesg')) {
-      badgeBg = const Color(0xFFFEF2F2);
-      badgeFg = const Color(0xFFDC2626);
-      badgeBorder = const Color(0xFFFECACA);
+      badgeBg = AppColors.errorBg;
+      badgeFg = AppColors.error;
+      badgeBorder = AppColors.errorBorder;
     }
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 4),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.celesteTint, Color(0xFFE0F7FA)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppColors.celesteBg, width: 1),
-              ),
-              alignment: Alignment.center,
-              child: Icon(icon, color: AppColors.celesteDark, size: 21),
-            ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
-                      letterSpacing: -0.2,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  if (progress != null && progress! > 0) ...[
-                    const SizedBox(height: 6),
-                    CampusProgress(value: progress!),
-                  ],
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        child: LayoutBuilder(
+          builder: (context, c) {
+            // La columna derecha se limita a ~45% de la fila (máx. 220 px):
+            // textos largos (p. ej. el giro del proveedor) se recortan con
+            // "…" en lugar de desbordar el layout.
+            final maxTrailing =
+                (c.maxWidth * .45).clamp(0.0, 220.0).toDouble();
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                if (trailing.isNotEmpty)
-                  Text(
-                    trailing,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textDark,
-                    ),
-                  ),
-                if (badge != null && badge!.isNotEmpty)
-                  Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: badgeBg,
-                      borderRadius: BorderRadius.circular(9),
-                      border: Border.all(color: badgeBorder, width: 0.8),
-                    ),
-                    child: Text(
-                      badge!,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: badgeFg,
+                ErpIconTile(icon: icon, size: 40, radius: 13),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textDark,
+                          letterSpacing: -0.2,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
                   ),
+                ),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: maxTrailing),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (trailing.isNotEmpty)
+                        Text(
+                          trailing,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      if (badge != null && badge!.isNotEmpty)
+                        Container(
+                          margin: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: badgeBg,
+                            borderRadius: BorderRadius.circular(5),
+                            border:
+                                Border.all(color: badgeBorder, width: 0.8),
+                          ),
+                          child: Text(
+                            badge!,
+                            style: TextStyle(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w900,
+                              color: badgeFg,
+                              letterSpacing: .3,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: AppColors.textSubtle,
+                ),
               ],
-            ),
-            const SizedBox(width: 4),
-            const Icon(
-              Icons.chevron_right_rounded,
-              size: 18,
-              color: AppColors.textSubtle,
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
@@ -358,14 +337,14 @@ class CampusKpiRow extends StatelessWidget {
                       size: 18, color: AppColors.celesteDark),
                   const SizedBox(height: 6),
                   Text(k.value,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           color: AppColors.textDark)),
                   Text(k.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 10.5,
                           color: AppColors.textMuted)),
                 ],

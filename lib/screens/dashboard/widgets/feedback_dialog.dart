@@ -58,7 +58,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
         if (success) {
           widget.onFeedbackSent?.call();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Gracias por tu retroalimentación para calibrar la IA.'),
               backgroundColor: AppColors.primaryBlue,
             ),
@@ -77,7 +77,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Row(
-        children: const [
+        children: [
           Icon(Icons.thumb_down_rounded, color: AppColors.error, size: 20),
           SizedBox(width: 8),
           Text(
@@ -91,7 +91,7 @@ class _FeedbackDialogState extends State<FeedbackDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               '¿Cuál fue la causa de la respuesta o cálculo insatisfactorio?',
               style: TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),

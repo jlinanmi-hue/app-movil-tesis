@@ -56,7 +56,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.fixedBorderLight),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -73,7 +73,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [AppColors.primaryBlue, AppColors.indigo],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -90,13 +90,13 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                     children: [
                       Row(
                         children: [
-                          const Flexible(
+                          Flexible(
                             child: Text(
                               'Consumo y Auditoría de Tokens IA',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textDark,
+                                color: AppColors.fixedTextDark,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -109,7 +109,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(color: const Color(0xFFBFDBFE)),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Motor IA',
                               style: TextStyle(
                                 fontSize: 9.5,
@@ -124,14 +124,14 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                       const SizedBox(height: 2),
                       Text(
                         'Rango: ${_data?.rango?.label ?? 'Últimos $_activePreset días'}',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                        style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
                       ),
                     ],
                   ),
                 ),
                 IconButton(
                   onPressed: () => _fetchTokens(),
-                  icon: const Icon(Icons.refresh_rounded, size: 18, color: AppColors.textMuted),
+                  icon: Icon(Icons.refresh_rounded, size: 18, color: AppColors.fixedTextMuted),
                   tooltip: 'Actualizar',
                 ),
               ],
@@ -159,25 +159,25 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                 padding: const EdgeInsets.all(12),
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.warningBg,
+                  color: AppColors.fixedWarningBg,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.warningBorder),
+                  border: Border.all(color: AppColors.fixedWarningBorder),
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.warningDark),
+                    Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.fixedWarningDark),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Pico de consumo inusual detectado',
                             style: TextStyle(
                               fontSize: 11.5,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.warningDark,
+                              color: AppColors.fixedWarningDark,
                             ),
                           ),
                           Text(
@@ -188,7 +188,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, size: 14, color: AppColors.warningDark),
+                      icon: Icon(Icons.close, size: 14, color: AppColors.fixedWarningDark),
                       onPressed: () => setState(() => _alertDismissed = true),
                     ),
                   ],
@@ -261,13 +261,13 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
             // ==========================================
             // 3. GRÁFICO DE EVOLUCIÓN TEMPORAL DE TOKENS
             // ==========================================
-            const Text(
+            Text(
               'EVOLUCIÓN DIARIA DE TOKENS',
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
-                color: AppColors.textMuted,
+                color: AppColors.fixedTextMuted,
               ),
             ),
             const SizedBox(height: 8),
@@ -279,27 +279,27 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : serie.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'No se registraron interacciones en este período.',
-                            style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                            style: TextStyle(fontSize: 11, color: AppColors.fixedTextSubtle),
                           ),
                         )
                       : SfCartesianChart(
                           margin: EdgeInsets.zero,
                           plotAreaBorderWidth: 0,
-                          primaryXAxis: const CategoryAxis(
+                          primaryXAxis: CategoryAxis(
                             majorGridLines: MajorGridLines(width: 0),
-                            labelStyle: TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                            labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                             labelRotation: -30,
                           ),
                           primaryYAxis: NumericAxis(
                             axisLine: const AxisLine(width: 0),
-                            majorGridLines: const MajorGridLines(
-                              color: AppColors.borderSoft,
+                            majorGridLines: MajorGridLines(
+                              color: AppColors.fixedBorderSoft,
                               dashArray: <double>[3, 3],
                             ),
-                            labelStyle: const TextStyle(fontSize: 9, color: AppColors.textSubtle),
+                            labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
                             numberFormat: null,
                           ),
                           series: <CartesianSeries<TokenDailyPoint, String>>[
@@ -330,14 +330,14 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
       labelStyle: TextStyle(
         fontSize: 11,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        color: isSelected ? AppColors.primaryBlue : AppColors.textMuted,
+        color: isSelected ? AppColors.primaryBlue : AppColors.fixedTextMuted,
       ),
       selectedColor: const Color(0xFFEFF6FF),
-      backgroundColor: AppColors.surfaceMuted,
+      backgroundColor: AppColors.fixedSurfaceMuted,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
         side: BorderSide(
-          color: isSelected ? const Color(0xFFBFDBFE) : AppColors.borderLight,
+          color: isSelected ? const Color(0xFFBFDBFE) : AppColors.fixedBorderLight,
         ),
       ),
       showCheckmark: false,
@@ -356,9 +356,9 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
+        color: AppColors.fixedSurfaceMuted,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.fixedBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -370,7 +370,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 10.5, color: AppColors.textMuted, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 10.5, color: AppColors.fixedTextMuted, fontWeight: FontWeight.w600),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -380,10 +380,10 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
           const SizedBox(height: 6),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w900,
-              color: AppColors.textDark,
+              color: AppColors.fixedTextDark,
               letterSpacing: -0.2,
             ),
             maxLines: 1,
@@ -392,7 +392,7 @@ class _AiTokenMetricsWidgetState extends State<AiTokenMetricsWidget> {
           const SizedBox(height: 2),
           Text(
             subtext,
-            style: const TextStyle(fontSize: 9.5, color: AppColors.textSubtle),
+            style: TextStyle(fontSize: 9.5, color: AppColors.fixedTextSubtle),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

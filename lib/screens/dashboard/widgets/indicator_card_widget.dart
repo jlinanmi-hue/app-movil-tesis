@@ -21,7 +21,7 @@ class IndicatorCardWidget extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.borderLight, width: 1),
+        side: BorderSide(color: AppColors.fixedBorderLight, width: 1),
       ),
       child: InkWell(
         onTap: onTap,
@@ -42,23 +42,47 @@ class IndicatorCardWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          indicator.titulo,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textDark,
-                            height: 1.25,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE0F2FE),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: const Color(0xFFBAE6FD)),
+                              ),
+                              child: Text(
+                                indicator.sigla,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF0369A1),
+                                  fontFamily: 'monospace',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 7),
+                            Expanded(
+                              child: Text(
+                                indicator.titulo,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.fixedTextDark,
+                                  height: 1.25,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 3),
                         Text(
                           indicator.subtitulo,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textSubtle,
+                            color: AppColors.fixedTextSubtle,
                           ),
                         ),
                       ],
@@ -85,9 +109,9 @@ class IndicatorCardWidget extends StatelessWidget {
               // ==========================================
               Container(
                 padding: const EdgeInsets.only(top: 10),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(color: AppColors.borderSoft, width: 1),
+                    top: BorderSide(color: AppColors.fixedBorderSoft, width: 1),
                   ),
                 ),
                 child: Row(
@@ -99,17 +123,17 @@ class IndicatorCardWidget extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.surfaceMuted,
+                            color: AppColors.fixedSurfaceMuted,
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: AppColors.borderLight),
+                            border: Border.all(color: AppColors.fixedBorderLight),
                           ),
                           child: Text(
                             _getMetaText(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'monospace',
-                              color: AppColors.textMuted,
+                              color: AppColors.fixedTextMuted,
                             ),
                           ),
                         ),
@@ -121,7 +145,7 @@ class IndicatorCardWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const Row(
+                    Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
@@ -164,18 +188,18 @@ class IndicatorCardWidget extends StatelessWidget {
       case 2:
         icon = Icons.trending_down_rounded;
         iconColor = AppColors.success;
-        bgColor = AppColors.successBg;
+        bgColor = AppColors.fixedSuccessBg;
         break;
       case 3:
         icon = Icons.inventory_2_outlined;
         iconColor = AppColors.purple;
-        bgColor = AppColors.purpleBg;
+        bgColor = AppColors.fixedSurfaceMuted;
         break;
       case 4:
       default:
         icon = Icons.access_time_rounded;
         iconColor = AppColors.indigo;
-        bgColor = AppColors.indigoBg;
+        bgColor = AppColors.fixedSurfaceMuted;
         break;
     }
 
@@ -263,7 +287,7 @@ class IndicatorCardWidget extends StatelessWidget {
                   width: 12,
                   color: AppColors.success,
                   cornerStyle: CornerStyle.bothCurve,
-                  gradient: const SweepGradient(
+                  gradient: SweepGradient(
                     colors: [AppColors.success, AppColors.primaryBlue],
                     stops: [0.6, 1.0],
                   ),
@@ -279,19 +303,19 @@ class IndicatorCardWidget extends StatelessWidget {
             children: [
               Text(
                 '${indicator.resultado.toStringAsFixed(1)}%',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
-                  color: AppColors.textDark,
+                  color: AppColors.fixedTextDark,
                   letterSpacing: -0.5,
                 ),
               ),
               Text(
                 deltaText,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: AppColors.successDark,
+                  color: AppColors.fixedSuccessDark,
                 ),
               ),
             ],
@@ -317,10 +341,10 @@ class IndicatorCardWidget extends StatelessWidget {
     return SfCartesianChart(
       margin: EdgeInsets.zero,
       plotAreaBorderWidth: 0,
-      primaryXAxis: const CategoryAxis(
+      primaryXAxis: CategoryAxis(
         majorGridLines: MajorGridLines(width: 0),
-        axisLine: AxisLine(color: AppColors.borderLight),
-        labelStyle: TextStyle(fontSize: 9, color: AppColors.textSubtle),
+        axisLine: AxisLine(color: AppColors.fixedBorderLight),
+        labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
       ),
       primaryYAxis: const NumericAxis(
         isVisible: false,
@@ -333,7 +357,7 @@ class IndicatorCardWidget extends StatelessWidget {
           color: AppColors.success.withValues(alpha: 0.18),
           borderColor: AppColors.success,
           borderWidth: 2.2,
-          markerSettings: const MarkerSettings(
+          markerSettings: MarkerSettings(
             isVisible: true,
             height: 6,
             width: 6,
@@ -362,10 +386,10 @@ class IndicatorCardWidget extends StatelessWidget {
     return SfCartesianChart(
       margin: EdgeInsets.zero,
       plotAreaBorderWidth: 0,
-      primaryXAxis: const CategoryAxis(
+      primaryXAxis: CategoryAxis(
         majorGridLines: MajorGridLines(width: 0),
-        axisLine: AxisLine(color: AppColors.borderLight),
-        labelStyle: TextStyle(fontSize: 9, color: AppColors.textSubtle),
+        axisLine: AxisLine(color: AppColors.fixedBorderLight),
+        labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
       ),
       primaryYAxis: const NumericAxis(
         isVisible: false,
@@ -399,10 +423,10 @@ class IndicatorCardWidget extends StatelessWidget {
     return SfCartesianChart(
       margin: EdgeInsets.zero,
       plotAreaBorderWidth: 0,
-      primaryXAxis: const CategoryAxis(
+      primaryXAxis: CategoryAxis(
         majorGridLines: MajorGridLines(width: 0),
-        axisLine: AxisLine(color: AppColors.borderLight),
-        labelStyle: TextStyle(fontSize: 9, color: AppColors.textSubtle),
+        axisLine: AxisLine(color: AppColors.fixedBorderLight),
+        labelStyle: TextStyle(fontSize: 9, color: AppColors.fixedTextSubtle),
       ),
       primaryYAxis: const NumericAxis(
         isVisible: false,
@@ -415,7 +439,7 @@ class IndicatorCardWidget extends StatelessWidget {
           color: AppColors.indigo.withValues(alpha: 0.18),
           borderColor: AppColors.indigo,
           borderWidth: 2.2,
-          markerSettings: const MarkerSettings(
+          markerSettings: MarkerSettings(
             isVisible: true,
             height: 6,
             width: 6,

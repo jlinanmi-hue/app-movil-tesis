@@ -79,9 +79,9 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
     if (mounted) {
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Configuración de servidor guardada.'),
-          backgroundColor: AppColors.successDark,
+          backgroundColor: AppColors.successFill,
         ),
       );
     }
@@ -92,7 +92,7 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Row(
-        children: const [
+        children: [
           Icon(Icons.dns_rounded, color: AppColors.primaryBlue),
           SizedBox(width: 8),
           Text(
@@ -106,8 +106,8 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Ajusta la URL base del backend Laravel compartido para tu entorno de desarrollo o pruebas:',
+            Text(
+              'Ajusta la URL base del backend Laravel (nube o entorno local):',
               style: TextStyle(fontSize: 12, color: AppColors.textMuted),
             ),
             const SizedBox(height: 14),
@@ -117,6 +117,11 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
               spacing: 6,
               runSpacing: 6,
               children: [
+                ActionChip(
+                  label: const Text('Backend Render'),
+                  onPressed: () => _urlController.text = ApiConfig.productionUrl,
+                  labelStyle: const TextStyle(fontSize: 11),
+                ),
                 ActionChip(
                   label: const Text('Android Emulador (10.0.2.2)'),
                   onPressed: () => _urlController.text = ApiConfig.emulatorAndroidUrl,
@@ -135,7 +140,7 @@ class _ServerConfigDialogState extends State<ServerConfigDialog> {
               controller: _urlController,
               decoration: const InputDecoration(
                 labelText: 'URL API Base',
-                hintText: 'http://10.0.2.2:8000/api',
+                hintText: ApiConfig.productionUrl,
                 prefixIcon: Icon(Icons.link_rounded),
               ),
               keyboardType: TextInputType.url,

@@ -22,28 +22,28 @@ class ChatTableWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: AppColors.fixedBorderLight),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.textDark),
+            style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: AppColors.fixedTextDark),
           ),
           const SizedBox(height: 8),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: DataTable(
-              headingRowColor: WidgetStateProperty.all(AppColors.surfaceMuted),
-              headingTextStyle: const TextStyle(
+              headingRowColor: WidgetStateProperty.all(AppColors.fixedSurfaceMuted),
+              headingTextStyle: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textDark,
+                color: AppColors.fixedTextDark,
               ),
-              dataTextStyle: const TextStyle(
+              dataTextStyle: TextStyle(
                 fontSize: 10.5,
-                color: AppColors.textDark,
+                color: AppColors.fixedTextDark,
               ),
               columnSpacing: 16,
               horizontalMargin: 12,

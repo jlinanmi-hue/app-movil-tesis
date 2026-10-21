@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/exceptions/api_exception.dart';
 import '../../core/services/api_service.dart';
 import '../../core/services/session_service.dart';
+import '../../core/widgets/erp_ui.dart';
 
 class PersonalDataScreen extends StatefulWidget {
   const PersonalDataScreen({super.key});
@@ -142,7 +143,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             ),
           ],
         ),
-        backgroundColor: isError ? AppColors.error : AppColors.successDark,
+        backgroundColor: isError ? AppColors.error : AppColors.successFill,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -159,33 +160,26 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
         : 'U';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: AppColors.headerNavy,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Datos del Colaborador',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        actions: [
-          if (_isLoading)
-            const Padding(
-              padding: EdgeInsets.only(right: 16),
-              child: Center(
-                child: SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          ErpHeader(
+            title: 'Datos del Colaborador',
+            actions: [
+              if (_isLoading)
+                const Padding(
+                  padding: EdgeInsets.only(right: 6),
+                  child: SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2),
+                  ),
                 ),
-              ),
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 40),
         child: Column(
           children: [
@@ -202,19 +196,8 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                         height: 92,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF1A65FF), Color(0xFF0B132B)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF1A65FF).withValues(alpha: 0.25),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                          border: Border.all(color: Colors.white, width: 3),
+                          color: AppColors.celesteDeep,
+                          border: Border.all(color: AppColors.backgroundLight, width: 3),
                         ),
                         alignment: Alignment.center,
                         child: Text(
@@ -233,15 +216,9 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: AppColors.primaryBlue,
+                            color: AppColors.celesteDeep,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.15),
-                                blurRadius: 6,
-                              ),
-                            ],
+                            border: Border.all(color: AppColors.backgroundLight, width: 2),
                           ),
                           child: const Icon(
                             Icons.camera_alt_rounded,
@@ -255,7 +232,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                   const SizedBox(height: 12),
                   Text(
                     user?.nombreCompleto ?? 'Usuario',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: AppColors.textDark,
@@ -266,25 +243,26 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFEFF6FF),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBFDBFE)),
+                          color: AppColors.celesteTint,
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: AppColors.celesteBg),
                         ),
                         child: Text(
                           empleado?.id ?? 'EMP-00001',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primaryBlue,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.celesteDeep,
+                            letterSpacing: .3,
                           ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Text(
                         '@${user?.userName ?? 'admin'}',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.textSubtle,
@@ -304,16 +282,9 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.hairline),
               ),
               child: Form(
                 key: _formKey,
@@ -325,28 +296,30 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEFF6FF),
+                            color: AppColors.celesteTint,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.person_rounded, size: 18, color: AppColors.primaryBlue),
+                          child: Icon(Icons.person_rounded, size: 18, color: AppColors.celesteDeep),
                         ),
                         const SizedBox(width: 10),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Mis Datos Personales',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
-                            ),
-                            Text(
-                              'Información de contacto modificable',
-                              style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
-                            ),
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mis Datos Personales',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                              ),
+                              Text(
+                                'Información de contacto modificable',
+                                style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const Divider(height: 28, color: AppColors.borderLight),
+                    Divider(height: 28, color: AppColors.borderLight),
 
                     // Nombres
                     _buildFieldLabel('Nombres *'),
@@ -501,6 +474,9 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
           ],
         ),
       ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -509,10 +485,10 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: AppColors.textMuted,
         ),
       ),
     );
@@ -525,27 +501,27 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-      prefixIcon: Icon(icon, size: 18, color: const Color(0xFF64748B)),
+      hintStyle: TextStyle(fontSize: 13, color: AppColors.textSubtle),
+      prefixIcon: Icon(icon, size: 18, color: AppColors.textMuted),
       suffixIcon: suffix,
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: AppColors.surfaceLight,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.hairline),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.hairline),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primaryBlue, width: 1.6),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.celesteDark, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error, width: 1.4),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.error, width: 1.4),
       ),
     );
   }
@@ -558,15 +534,15 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
     final isSelected = _sexo == value;
     return InkWell(
       onTap: () => setState(() => _sexo = value),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(10),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFEFF6FF) : const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected ? AppColors.celesteTint : AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: isSelected ? AppColors.primaryBlue : const Color(0xFFE2E8F0),
+            color: isSelected ? AppColors.celesteDeep : AppColors.hairline,
             width: isSelected ? 1.6 : 1,
           ),
         ),
@@ -576,7 +552,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             Icon(
               icon,
               size: 18,
-              color: isSelected ? AppColors.primaryBlue : const Color(0xFF64748B),
+              color: isSelected ? AppColors.celesteDeep : AppColors.textMuted,
             ),
             const SizedBox(width: 6),
             Text(
@@ -584,7 +560,7 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
               style: TextStyle(
                 fontSize: 12.5,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                color: isSelected ? AppColors.primaryBlue : const Color(0xFF334155),
+                color: isSelected ? AppColors.celesteDeep : AppColors.textDark,
               ),
             ),
           ],

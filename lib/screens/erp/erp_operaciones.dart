@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_colors.dart';
 import '../../core/services/modules_service.dart';
 import '../../core/widgets/campus_card.dart';
+import '../../core/widgets/erp_ui.dart';
 import '../../models/erp_models.dart';
 import '../erp/erp_list_screen.dart';
+import 'despacho_tab.dart';
 import 'erp_form.dart';
+import 'erp_history_screen.dart';
+import 'kardex_tab.dart';
+import 'nueva_compra_screen.dart';
+import 'nuevo_cliente_screen.dart';
+import 'nuevo_pedido_screen.dart';
+import 'nuevo_proveedor_screen.dart';
+import 'pedido_detalle_dialog.dart';
+import 'productos_catalogo_tab.dart';
+import 'recepcion_tab.dart';
 
 // ===================================================================
 // OPERACIONES (solo 4): Órdenes, Inventario, Proveedores, Clientes
@@ -16,23 +28,11 @@ void _snack(BuildContext context, String msg) {
       content: Text(msg), behavior: SnackBarBehavior.floating));
 }
 
-Map<String, String> _rawInitial(ErpItem e, List<ErpField> fields) {
-  final out = <String, String>{};
-  for (final f in fields) {
-    final v = e.raw[f.key];
-    if (v == null) continue;
-    // Ignora Maps/Listas (ej. cliente:{...}) que romperían dropdowns/textos
-    if (v is Map || v is List) continue;
-    final s = '$v'.trim();
-    if (s.isEmpty || s == '—' || s == 'null') continue;
-    out[f.key] = s;
-  }
-  return out;
-}
-
 // ---------------- 1. GESTIÓN CLIENTES (CRUD + historial pedidos) ----------------
 class ClientesScreen extends StatefulWidget {
-  const ClientesScreen({super.key});
+  /// true cuando vive dentro de la pestaña de un hub (sin cabecera propia).
+  final bool incrustado;
+  const ClientesScreen({super.key, this.incrustado = false});
   @override
   State<ClientesScreen> createState() => _ClientesScreenState();
 }
@@ -47,44 +47,32 @@ class _ClientesScreenState extends State<ClientesScreen> {
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey(_refresh),
+      incrustado: widget.incrustado, // dentro de un hub no repite cabecera
       title: 'Gestión de Clientes',
       subtitle: 'Directorio comercial',
-      heroLabel: 'Clientes registrados',
-      heroValue: '128',
-      heroCaption: '46 recurrentes • +12 este mes',
-      heroIcon: Icons.groups_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.groups_outlined, value: '128', label: 'Activos'),
-        CampusKpi(icon: Icons.repeat_rounded, value: '46', label: 'Recurrentes'),
-        CampusKpi(icon: Icons.star_outline_rounded, value: '18', label: 'Top'),
-        CampusKpi(icon: Icons.person_off_outlined, value: '9', label: 'Inactivos'),
-      ],
-      tabs: const ['Activos', 'Recurrentes', 'Top compras', 'Inactivos', 'Eliminados'],
+      tabs: const ['Activos', 'Inactivos'],
       loader: (s, t) => _svc.clientes(search: s, tab: t),
       rowIcon: Icons.person_outline_rounded,
       searchHint: 'Buscar por nombre, RUC o DNI...',
       historyLabel: 'Pedidos',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Registrar cliente',
-        fields: ErpForms.cliente(),
-        onSave: (d) => _svc.crear('/clientes', d),
-        onSaved: () {
-          _reload();
-          _snack(context, 'Cliente registrado.');
-        },
-      ),
-      onEdit: (e) => ErpFormSheet.show(
-        context,
-        title: 'Editar cliente',
-        fields: ErpForms.cliente(),
-        initial: _rawInitial(e, ErpForms.cliente()),
-        onSave: (d) => _svc.actualizar('/clientes', e.id, d),
-        onSaved: () {
-          _reload();
-          _snack(context, 'Cliente actualizado.');
-        },
-      ),
+      onCreate: () async {
+        final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(
+          builder: (_) => const NuevoClienteScreen(),
+        ));
+        if (!context.mounted) return;
+        if (ok != true) return;
+        _reload();
+        _snack(context, 'Cliente registrado.');
+      },
+      onEdit: (e) async {
+        final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(
+          builder: (_) => NuevoClienteScreen(cliente: e),
+        ));
+        if (!context.mounted) return;
+        if (ok != true) return;
+        _reload();
+        _snack(context, 'Cliente actualizado.');
+      },
       onDelete: (e) async {
         await _svc.eliminar('/clientes', e.id);
         _reload();
@@ -105,7 +93,9 @@ class _ClientesScreenState extends State<ClientesScreen> {
 
 // ---------------- 2. GESTIÓN PROVEEDORES (CRUD + detalle) ----------------
 class ProveedoresScreen extends StatefulWidget {
-  const ProveedoresScreen({super.key});
+  /// true cuando vive dentro de la pestaña de un hub (sin cabecera propia).
+  final bool incrustado;
+  const ProveedoresScreen({super.key, this.incrustado = false});
   @override
   State<ProveedoresScreen> createState() => _ProveedoresScreenState();
 }
@@ -119,44 +109,32 @@ class _ProveedoresScreenState extends State<ProveedoresScreen> {
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey(_refresh),
+      incrustado: widget.incrustado, // dentro de un hub no repite cabecera
       title: 'Gestión de Proveedores',
       subtitle: 'Abastecimiento',
-      heroLabel: 'Cumplimiento promedio',
-      heroValue: '92%',
-      heroCaption: '5 activos • ranking al día',
-      heroIcon: Icons.local_shipping_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.store_outlined, value: '5', label: 'Activos'),
-        CampusKpi(icon: Icons.check_circle_outline_rounded, value: '92%', label: 'Cumple.'),
-        CampusKpi(icon: Icons.warning_amber_rounded, value: '1', label: 'Riesgo'),
-        CampusKpi(icon: Icons.delete_outline_rounded, value: '0', label: 'Elimin.'),
-      ],
       tabs: const ['Activos', 'Inactivos', 'Eliminados'],
       loader: (s, t) => _svc.proveedores(search: s, tab: t),
       rowIcon: Icons.business_outlined,
       searchHint: 'Buscar proveedor o RUC...',
       historyLabel: 'Detalle',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Registrar proveedor',
-        fields: ErpForms.proveedor(),
-        onSave: (d) => _svc.crear('/proveedores', d),
-        onSaved: () {
-          _reload();
-          _snack(context, 'Proveedor registrado.');
-        },
-      ),
-      onEdit: (e) => ErpFormSheet.show(
-        context,
-        title: 'Editar proveedor',
-        fields: ErpForms.proveedor(),
-        initial: _rawInitial(e, ErpForms.proveedor()),
-        onSave: (d) => _svc.actualizar('/proveedores', e.id, d),
-        onSaved: () {
-          _reload();
-          _snack(context, 'Proveedor actualizado.');
-        },
-      ),
+      onCreate: () async {
+        final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(
+          builder: (_) => const NuevoProveedorScreen(),
+        ));
+        if (!context.mounted) return;
+        if (ok != true) return;
+        _reload();
+        _snack(context, 'Proveedor registrado.');
+      },
+      onEdit: (e) async {
+        final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(
+          builder: (_) => NuevoProveedorScreen(proveedor: e),
+        ));
+        if (!context.mounted) return;
+        if (ok != true) return;
+        _reload();
+        _snack(context, 'Proveedor actualizado.');
+      },
       onDelete: (e) async {
         await _svc.eliminar('/proveedores', e.id);
         _reload();
@@ -179,199 +157,111 @@ class _ProveedoresScreenState extends State<ProveedoresScreen> {
 
 // ---------------- 3. CONTROL INVENTARIO (hub: Stock / Kardex / Ajustes) ----------------
 class InventarioHubScreen extends StatelessWidget {
-  const InventarioHubScreen({super.key});
+  /// Pestaña inicial: 0 Stock y Productos · 1 Kardex · 2 Ajustes.
+  final int initialIndex;
+
+  const InventarioHubScreen({super.key, this.initialIndex = 0});
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
+      initialIndex: initialIndex.clamp(0, 2),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    if (Navigator.canPop(context))
-                      IconButton(
-                          onPressed: () => Navigator.maybePop(context),
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Color(0xFF0096C7))),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Control de Inventario',
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0A3642))),
-                          Text('Stock, Kardex y ajustes',
-                              style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4A7C8E))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const TabBar(
-                isScrollable: true,
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0xFF4A7C8E),
-                indicator: BoxDecoration(color: Color(0xFF0096C7)),
+        backgroundColor: AppColors.backgroundLight,
+        // UNA sola cabecera para todo el hub (pestañas segmentadas).
+        body: Column(
+          children: [
+            ErpHeader(
+              title: 'Control de Inventario',
+              subtitle: 'Stock, Kardex y ajustes',
+              bottom: const ErpSegmentedTabs(
                 tabs: [
-                  Tab(text: 'Stock y Productos'),
-                  Tab(text: 'Kardex'),
-                  Tab(text: 'Ajustes')
+                  ErpTabSpec('Stock y Productos',
+                      icon: Icons.inventory_2_rounded),
+                  ErpTabSpec('Kardex', icon: Icons.receipt_outlined),
+                  ErpTabSpec('Ajustes', icon: Icons.handyman_outlined),
                 ],
               ),
-              const Expanded(
-                child: TabBarView(
-                  children: [
-                    _ProductosTab(),
-                    _KardexTab(),
-                    _AjustesTab(),
-                  ],
-                ),
+            ),
+            const Expanded(
+              child: TabBarView(
+                children: [
+                  ProductosTab(),
+                  KardexTab(),
+                  AjustesTab(),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _ProductosTab extends StatefulWidget {
-  const _ProductosTab();
+class AjustesTab extends StatefulWidget {
+  const AjustesTab({super.key});
   @override
-  State<_ProductosTab> createState() => _ProductosTabState();
+  State<AjustesTab> createState() => AjustesTabState();
 }
 
-class _ProductosTabState extends State<_ProductosTab> {
+class AjustesTabState extends State<AjustesTab> {
   int _r = 0;
-  final _svc = ModulesService();
-  @override
-  Widget build(BuildContext context) {
-    return ErpListScreen(
-      key: ValueKey(_r),
-      title: 'Stock y Productos',
-      subtitle: 'Catálogo maestro',
-      heroLabel: 'Valorizado estimado',
-      heroValue: 'S/ 24.5k',
-      heroCaption: '320 SKUs • 3 en quiebre',
-      heroIcon: Icons.inventory_2_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.inventory_2_outlined, value: '320', label: 'SKUs'),
-        CampusKpi(icon: Icons.warning_amber_rounded, value: '3', label: 'Bajo'),
-        CampusKpi(icon: Icons.remove_shopping_cart_outlined, value: '1', label: 'Agot.'),
-        CampusKpi(icon: Icons.delete_outline_rounded, value: '0', label: 'Elim.'),
-      ],
-      tabs: const ['Activos', 'Stock bajo', 'Eliminados'],
-      loader: (s, t) => _svc.productos(search: s, tab: t),
-      rowIcon: Icons.shopping_bag_outlined,
-      searchHint: 'Buscar producto...',
-      historyLabel: 'Kardex',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Registrar producto',
-        fields: ErpForms.producto(),
-        onSave: (d) => _svc.crear('/inventario/productos', d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Producto registrado con detalles y stock inicial.');
-        },
-      ),
-      onEdit: (e) => ErpFormSheet.show(
-        context,
-        title: 'Editar producto',
-        fields: ErpForms.producto(),
-        initial: _rawInitial(e, ErpForms.producto()),
-        onSave: (d) => _svc.actualizar('/inventario/productos', e.id, d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Producto actualizado.');
-        },
-      ),
-      onDelete: (e) async {
-        await _svc.eliminar('/inventario/productos', e.id);
-        setState(() => _r++);
-        if (context.mounted) _snack(context, 'Producto eliminado.');
-      },
-      onHistory: (e) async {
-        final rows = await _svc.generico('/inventario/movimientos');
-        if (context.mounted) {
-          ErpHistoryTable.show(context,
-              title: 'Kardex • ${e.titulo}',
-              columns: const ['Movimiento', 'Detalle', 'Cant.', 'Estado'],
-              rows: rows
-                  .take(8)
-                  .map((x) => [x.titulo, x.subtitulo, x.monto, x.estado])
-                  .toList());
-        }
-      },
-    );
-  }
-}
+  bool _mostrarHistorial = false;
 
-class _KardexTab extends StatelessWidget {
-  const _KardexTab();
   @override
   Widget build(BuildContext context) {
     final svc = ModulesService();
-    return ErpListScreen(
-      title: 'Kardex y Movimientos',
-      subtitle: 'Entradas y salidas',
-      heroLabel: 'Movimientos hoy',
-      heroValue: '34',
-      heroCaption: '18 entradas • 16 salidas',
-      heroIcon: Icons.swap_vert_rounded,
-      kpis: [
-        CampusKpi(icon: Icons.arrow_downward_rounded, value: '18', label: 'Entradas'),
-        CampusKpi(icon: Icons.arrow_upward_rounded, value: '16', label: 'Salidas'),
-        CampusKpi(icon: Icons.tune_rounded, value: '2', label: 'Ajustes'),
-        CampusKpi(icon: Icons.today_outlined, value: 'Hoy', label: 'Filtro'),
-      ],
-      tabs: const ['Todos', 'Entradas', 'Salidas'],
-      loader: (s, t) => svc.movimientos(search: s, tab: t),
-      rowIcon: Icons.receipt_outlined,
-      searchHint: 'Buscar movimiento...',
-    );
-  }
-}
-
-class _AjustesTab extends StatefulWidget {
-  const _AjustesTab();
-  @override
-  State<_AjustesTab> createState() => _AjustesTabState();
-}
-
-class _AjustesTabState extends State<_AjustesTab> {
-  int _r = 0;
-  @override
-  Widget build(BuildContext context) {
-    final svc = ModulesService();
+    if (_mostrarHistorial) {
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Row(
+              children: [
+                TextButton.icon(
+                  onPressed: () => setState(() => _mostrarHistorial = false),
+                  icon: const Icon(Icons.arrow_back_rounded, size: 16),
+                  label: const Text('Volver a Ajustes', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ErpHistoryScreen(
+              incrustado: true,
+              title: 'Historial de Ajustes y Mermas',
+              subtitle: 'Registro de pérdidas y correcciones de stock',
+              columns: const ['Tipo Ajuste', 'Motivo / Detalle', 'Cantidad', 'Fecha', 'Estado'],
+              loader: () async {
+                final items = await svc.ajustes();
+                return items.map((e) {
+                  final j = e.raw;
+                  final tipo = (j['Ajuste_inventario_tipo'] ?? j['tipo'] ?? e.titulo).toString();
+                  final motivo = (j['Ajuste_inventario_motivo'] ?? j['motivo'] ?? 'Conteo físico').toString();
+                  final cant = e.monto.isNotEmpty
+                      ? e.monto
+                      : (j['Ajuste_inventario_cantidad'] != null ? '-${j['Ajuste_inventario_cantidad']} uds.' : '—');
+                  final fecha = ErpItem.formatDate(j['Ajuste_inventario_fecha'] ?? j['fecha'] ?? j['created_at']);
+                  return [tipo, motivo, cant, fecha.isNotEmpty ? fecha : '—', e.estado];
+                }).toList();
+              },
+            ),
+          ),
+        ],
+      );
+    }
     return ErpListScreen(
       key: ValueKey(_r),
+      incrustado: true, // la ÚNICA cabecera es la del hub
       title: 'Ajustes de Inventario',
-      subtitle: 'Mermas, daños y vencimientos',
-      heroLabel: 'Impacto mes',
-      heroValue: 'S/ 320',
-      heroCaption: '6 ajustes • 2 mermas',
-      heroIcon: Icons.tune_rounded,
-      kpis: [
-        CampusKpi(icon: Icons.tune_rounded, value: '6', label: 'Ajustes'),
-        CampusKpi(icon: Icons.warning_amber_rounded, value: '2', label: 'Mermas'),
-        CampusKpi(icon: Icons.attach_money_rounded, value: '320', label: 'Impacto'),
-        CampusKpi(icon: Icons.today_outlined, value: 'Hoy', label: 'Filtro'),
-      ],
       tabs: const ['Todos', 'Mermas', 'Daños'],
       loader: (s, t) => svc.ajustes(search: s, tab: t),
       rowIcon: Icons.handyman_outlined,
+      historyLabel: 'Tabla',
+      onHistory: (_) {
+        setState(() => _mostrarHistorial = true);
+      },
       onCreate: () => ErpFormSheet.show(
         context,
         title: 'Registrar ajuste manual',
@@ -394,187 +284,266 @@ class _AjustesTabState extends State<_AjustesTab> {
   }
 }
 
-// ---------------- 4. CONTROL ÓRDENES (hub completo) ----------------
-class OrdenesHubScreen extends StatelessWidget {
-  const OrdenesHubScreen({super.key});
+// ---------------- 4. HUBS DE ÓRDENES (pedidos y compras separados) ----------------
+// El flujo comercial de clientes (Pedidos + Despacho) va por un lado y el de
+// abastecimiento (Compras + Recepción) por otro: nunca se mezclan en la misma
+// barra de pestañas.
+
+/// Vista anidada Pedidos | Despacho (se usa dentro del hub de operaciones).
+class PedidosDespachoView extends StatelessWidget {
+  final int initialIndex;
+  const PedidosDespachoView({super.key, this.initialIndex = 0});
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 2,
+      initialIndex: initialIndex.clamp(0, 1),
+      child: Column(
+        children: const [
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 10, 16, 2),
+            child: ErpSegmentedTabs(
+              tabs: [
+                ErpTabSpec('Pedidos', icon: Icons.receipt_long_rounded),
+                ErpTabSpec('Despacho', icon: Icons.delivery_dining_rounded),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                PedidosTab(),
+                DespachoTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Vista anidada Compras | Recepción (se usa dentro del hub de operaciones).
+class ComprasRecepcionView extends StatelessWidget {
+  final int initialIndex;
+  const ComprasRecepcionView({super.key, this.initialIndex = 0});
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      initialIndex: initialIndex.clamp(0, 1),
+      child: Column(
+        children: const [
+          Padding(
+            padding: EdgeInsets.fromLTRB(16, 10, 16, 2),
+            child: ErpSegmentedTabs(
+              tabs: [
+                ErpTabSpec('Compras', icon: Icons.request_page_rounded),
+                ErpTabSpec('Recepción', icon: Icons.unarchive_rounded),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                CompraTab(),
+                RecepcionTab(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Hub de PEDIDOS: órdenes de clientes y despacho, nada más.
+class PedidosHubScreen extends StatelessWidget {
+  /// Pestaña inicial: 0 Pedidos · 1 Despacho.
+  final int initialIndex;
+
+  const PedidosHubScreen({super.key, this.initialIndex = 0});
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      initialIndex: initialIndex.clamp(0, 1),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    if (Navigator.canPop(context))
-                      IconButton(
-                          onPressed: () => Navigator.maybePop(context),
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Color(0xFF0096C7))),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Control de Órdenes',
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0A3642))),
-                          Text('Clientes, compra, recepción e historial',
-                              style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4A7C8E))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const TabBar(
-                isScrollable: true,
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0xFF4A7C8E),
-                indicator: BoxDecoration(color: Color(0xFF0096C7)),
+        backgroundColor: AppColors.backgroundLight,
+        // UNA sola cabecera para todo el hub (pestañas segmentadas).
+        body: Column(
+          children: [
+            ErpHeader(
+              title: 'Pedidos',
+              subtitle: 'Órdenes de clientes y despacho',
+              bottom: const ErpSegmentedTabs(
                 tabs: [
-                  Tab(text: 'Pedidos'),
-                  Tab(text: 'Compra'),
-                  Tab(text: 'Recepción'),
-                  Tab(text: 'Historial'),
+                  ErpTabSpec('Pedidos', icon: Icons.receipt_long_rounded),
+                  ErpTabSpec('Despacho', icon: Icons.delivery_dining_rounded),
                 ],
               ),
-              const Expanded(
-                child: TabBarView(
-                  children: [
-                    _PedidosTab(),
-                    _CompraTab(),
-                    _RecepcionTab(),
-                    _HistorialOrdenesTab(),
-                  ],
-                ),
+            ),
+            const Expanded(
+              child: TabBarView(
+                children: [
+                  PedidosTab(),
+                  DespachoTab(),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _PedidosTab extends StatefulWidget {
-  const _PedidosTab();
-  @override
-  State<_PedidosTab> createState() => _PedidosTabState();
-}
+/// Hub de COMPRAS: órdenes de compra y recepción de mercadería, nada más.
+class ComprasHubScreen extends StatelessWidget {
+  /// Pestaña inicial: 0 Compras · 1 Recepción.
+  final int initialIndex;
 
-class _PedidosTabState extends State<_PedidosTab> {
-  int _r = 0;
-  final _svc = ModulesService();
+  const ComprasHubScreen({super.key, this.initialIndex = 0});
   @override
   Widget build(BuildContext context) {
-    return ErpListScreen(
-      key: ValueKey(_r),
-      title: 'Órdenes de Clientes',
-      subtitle: 'Nueva + historial',
-      heroLabel: 'Pedidos hoy',
-      heroValue: '21',
-      heroCaption: 'S/ 8,450 • 5 despachados',
-      heroIcon: Icons.receipt_long_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.inbox_outlined, value: '21', label: 'Hoy'),
-        CampusKpi(icon: Icons.hourglass_empty_rounded, value: '6', label: 'Valid.'),
-        CampusKpi(icon: Icons.inventory_outlined, value: '11', label: 'Prep.'),
-        CampusKpi(icon: Icons.local_shipping_outlined, value: '5', label: 'Desp.'),
-      ],
-      tabs: const ['Nueva', 'Historial'],
-      loader: (s, t) => _svc.pedidos(search: s, tab: t),
-      rowIcon: Icons.shopping_cart_outlined,
-      searchHint: 'Buscar pedido o cliente...',
-      historyLabel: 'Detalle',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Nuevo pedido de cliente',
-        fields: ErpForms.pedidoCliente(),
-        onSave: (d) => _svc.crear('/pedidos', d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Pedido registrado (cliente + canal + ítems).');
-        },
+    return DefaultTabController(
+      length: 2,
+      initialIndex: initialIndex.clamp(0, 1),
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundLight,
+        // UNA sola cabecera para todo el hub (pestañas segmentadas).
+        body: Column(
+          children: [
+            ErpHeader(
+              title: 'Compras',
+              subtitle: 'Órdenes a proveedores y recepción',
+              bottom: const ErpSegmentedTabs(
+                tabs: [
+                  ErpTabSpec('Compras', icon: Icons.request_page_rounded),
+                  ErpTabSpec('Recepción', icon: Icons.unarchive_rounded),
+                ],
+              ),
+            ),
+            const Expanded(
+              child: TabBarView(
+                children: [
+                  CompraTab(),
+                  RecepcionTab(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
-      onEdit: (e) => ErpFormSheet.show(
-        context,
-        title: 'Editar pedido',
-        fields: ErpForms.pedidoCliente(),
-        onSave: (d) => _svc.actualizar('/pedidos', e.id, d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Pedido actualizado.');
-        },
-      ),
-      onDelete: (e) async {
-        await _svc.eliminar('/pedidos', e.id);
-        setState(() => _r++);
-        if (context.mounted) _snack(context, 'Pedido eliminado.');
-      },
-      onHistory: (e) {
-        ErpHistoryTable.show(context,
-            title: 'Detalle • ${e.titulo}',
-            columns: const ['Campo', 'Valor'],
-            rows: [
-              ['Código', e.titulo],
-              ['Cliente/Fecha', e.subtitulo],
-              ['Total', e.monto],
-              ['Estado', e.estado],
-            ]);
-      },
     );
   }
 }
 
-class _CompraTab extends StatefulWidget {
-  const _CompraTab();
+/// Historial en tablas (pedidos, compras, recepción) como pantalla propia.
+class HistorialOrdenesScreen extends StatelessWidget {
+  const HistorialOrdenesScreen({super.key});
   @override
-  State<_CompraTab> createState() => _CompraTabState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          const ErpHeader(
+            title: 'Historial',
+            subtitle: 'Pedidos, compras y recepción en tablas',
+          ),
+          const Expanded(child: HistorialOrdenesTab()),
+        ],
+      ),
+    );
+  }
 }
 
-class _CompraTabState extends State<_CompraTab> {
+class PedidosTab extends StatefulWidget {
+  const PedidosTab({super.key});
+  @override
+  State<PedidosTab> createState() => PedidosTabState();
+}
+
+class PedidosTabState extends State<PedidosTab> {
   int _r = 0;
   final _svc = ModulesService();
   @override
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey(_r),
+      incrustado: true, // la ÚNICA cabecera es la del hub
+      title: 'Órdenes de Clientes',
+      subtitle: 'Listado de pedidos',
+      tabs: const ['Todos', 'Pendientes', 'Completados', 'Cancelados'],
+      loader: (s, t) => _svc.pedidos(search: s, tab: t),
+      rowIcon: Icons.shopping_cart_outlined,
+      searchHint: 'Buscar pedido o cliente...',
+      onCreate: () async {
+        // Proceso completo: cliente → productos → envío → guardar.
+        final creado = await Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const NuevoPedidoScreen()),
+        );
+        if (creado == true && mounted) setState(() => _r++);
+      },
+      // Al tocar una fila: modal compacto con detalle + listado breve de
+      // productos, y acciones Editar / Eliminar (solo si está pendiente).
+      onRowTap: (e) => PedidoDetalleDialog.mostrar(
+        context,
+        pedidoId: e.id,
+        resumen: e.raw,
+        onEditar: () async {
+          final actualizado = await Navigator.of(context).push(
+            MaterialPageRoute(
+                builder: (_) => NuevoPedidoScreen(pedidoId: e.id)),
+          );
+          if (!mounted) return;
+          if (actualizado == true) {
+            setState(() => _r++);
+            if (context.mounted) _snack(context, 'Pedido actualizado.');
+          }
+        },
+        onEliminar: () async {
+          await _svc.eliminar('/pedidos', e.id);
+          if (!mounted) return;
+          setState(() => _r++);
+          if (context.mounted) _snack(context, 'Pedido eliminado.');
+        },
+      ),
+    );
+  }
+}
+
+class CompraTab extends StatefulWidget {
+  const CompraTab({super.key});
+  @override
+  State<CompraTab> createState() => CompraTabState();
+}
+
+class CompraTabState extends State<CompraTab> {
+  int _r = 0;
+  final _svc = ModulesService();
+  @override
+  Widget build(BuildContext context) {
+    return ErpListScreen(
+      key: ValueKey(_r),
+      incrustado: true, // la ÚNICA cabecera es la del hub
       title: 'Órdenes de Compra',
-      subtitle: 'Nueva + historial a proveedor',
-      heroLabel: 'Compra abierta',
-      heroValue: 'S/ 16.4k',
-      heroCaption: '3 órdenes • 1 en recepción',
-      heroIcon: Icons.shopping_basket_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.description_outlined, value: '3', label: 'Abiertas'),
-        CampusKpi(icon: Icons.unarchive_outlined, value: '1', label: 'Recep.'),
-        CampusKpi(icon: Icons.check_circle_outline_rounded, value: '12', label: 'Cerradas'),
-        CampusKpi(icon: Icons.cancel_outlined, value: '0', label: 'Anul.'),
-      ],
-      tabs: const ['Nueva', 'Historial'],
+      subtitle: 'Órdenes a proveedores',
+      tabs: const ['Todas', 'Pendientes', 'Cerradas', 'Anuladas'],
       loader: (s, t) => _svc.ordenesCompra(search: s, tab: t),
       rowIcon: Icons.request_page_outlined,
       searchHint: 'Buscar OC o proveedor...',
       historyLabel: 'Recepción',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Nueva orden de compra',
-        fields: ErpForms.ordenCompra(),
-        onSave: (d) => _svc.crear('/ordenes-compra', d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Orden de compra generada (proveedor + ítems).');
-        },
-      ),
+      onCreate: () async {
+        final ok = await Navigator.of(context).push<bool>(
+          MaterialPageRoute(builder: (_) => const NuevaCompraScreen()),
+        );
+        if (!mounted) return;
+        if (ok == true) setState(() => _r++);
+      },
       onEdit: (e) => ErpFormSheet.show(
         context,
         title: 'Editar orden',
@@ -603,62 +572,9 @@ class _CompraTabState extends State<_CompraTab> {
   }
 }
 
-class _RecepcionTab extends StatefulWidget {
-  const _RecepcionTab();
-  @override
-  State<_RecepcionTab> createState() => _RecepcionTabState();
-}
-
-class _RecepcionTabState extends State<_RecepcionTab> {
-  int _r = 0;
-  final _svc = ModulesService();
-  @override
-  Widget build(BuildContext context) {
-    return ErpListScreen(
-      key: ValueKey(_r),
-      title: 'Recepción de Mercadería',
-      subtitle: 'Iniciar, recepcionar y cerrar',
-      heroLabel: 'Por atender',
-      heroValue: '4',
-      heroCaption: '2 parciales • 8 conformes',
-      heroIcon: Icons.inventory_2_outlined,
-      kpis: [
-        CampusKpi(icon: Icons.inbox_outlined, value: '4', label: 'Por atender'),
-        CampusKpi(icon: Icons.timelapse_rounded, value: '2', label: 'Parciales'),
-        CampusKpi(icon: Icons.check_circle_outline_rounded, value: '8', label: 'Conformes'),
-        CampusKpi(icon: Icons.warning_amber_rounded, value: '1', label: 'Faltante'),
-      ],
-      tabs: const ['Por atender', 'Parciales', 'Cerradas'],
-      loader: (s, t) => _svc.ordenesCompra(search: s, tab: t),
-      rowIcon: Icons.unarchive_outlined,
-      searchHint: 'Buscar orden...',
-      historyLabel: 'Historial',
-      onCreate: () => ErpFormSheet.show(
-        context,
-        title: 'Recepcionar mercadería',
-        fields: ErpForms.recepcion(),
-        onSave: (d) => _svc.recepcionarItem(d['orden_id'] ?? '1', d),
-        onSaved: () {
-          setState(() => _r++);
-          _snack(context, 'Ítem recepcionado (parcial / rechazo / cierre).');
-        },
-      ),
-      onHistory: (e) async {
-        final rows = await _svc.historialRecepcion(e.id);
-        if (context.mounted) {
-          ErpHistoryTable.show(context,
-              title: 'Historial • ${e.titulo}',
-              columns: const ['Fecha', 'Producto', 'Recibido', 'Estado'],
-              rows: rows);
-        }
-      },
-    );
-  }
-}
-
 // Historial global con tablas: clientes, pedidos, OC, recepción
-class _HistorialOrdenesTab extends StatelessWidget {
-  const _HistorialOrdenesTab();
+class HistorialOrdenesTab extends StatelessWidget {
+  const HistorialOrdenesTab({super.key});
   @override
   Widget build(BuildContext context) {
     final svc = ModulesService();
@@ -725,7 +641,7 @@ class _HistorialOrdenesTab extends StatelessWidget {
     ];
 
     return ListView.separated(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
       itemCount: cards.length,
       separatorBuilder: (_, index) => const SizedBox(height: 10),
       itemBuilder: (_, i) {
@@ -736,33 +652,25 @@ class _HistorialOrdenesTab extends StatelessWidget {
           child: CampusCard(
             child: Row(
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFEAF9FE),
-                      borderRadius: BorderRadius.circular(14)),
-                  alignment: Alignment.center,
-                  child: Icon(c.$3, color: const Color(0xFF0096C7)),
-                ),
+                ErpIconTile(icon: c.$3, size: 44, radius: 14),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(c.$1,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 13.5,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF0A3642))),
+                                color: AppColors.textDark)),
                         Text(c.$2,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 11,
-                                color: Color(0xFF4A7C8E))),
+                                color: AppColors.textMuted)),
                       ]),
                 ),
-                const Icon(Icons.table_chart_outlined,
-                    color: Color(0xFF0096C7)),
+                Icon(Icons.table_chart_outlined,
+                    color: AppColors.celesteDark),
               ],
             ),
           ),
@@ -776,13 +684,13 @@ class _HistorialOrdenesTab extends StatelessWidget {
 class PedidosScreen extends StatelessWidget {
   const PedidosScreen({super.key});
   @override
-  Widget build(BuildContext context) => const OrdenesHubScreen();
+  Widget build(BuildContext context) => const PedidosHubScreen();
 }
 
 class OrdenesCompraScreen extends StatelessWidget {
   const OrdenesCompraScreen({super.key});
   @override
-  Widget build(BuildContext context) => const OrdenesHubScreen();
+  Widget build(BuildContext context) => const ComprasHubScreen();
 }
 
 class ProductosScreen extends StatelessWidget {

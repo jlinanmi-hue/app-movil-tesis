@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_colors.dart';
 import '../../core/services/modules_service.dart';
+import '../../core/widgets/erp_ui.dart';
 import '../../models/erp_models.dart';
 import '../erp/erp_list_screen.dart';
 import 'erp_form.dart';
@@ -44,11 +46,6 @@ class _PersonalScreenState extends State<PersonalScreen> {
       key: ValueKey(_r),
       title: 'Gestión de Personal',
       subtitle: 'Directorio y registro',
-      heroLabel: 'Colaboradores',
-      heroValue: '24',
-      heroCaption: '18 activos • 2 vacaciones',
-      heroIcon: Icons.badge_outlined,
-      kpis: const [],
       tabs: const ['Activos', 'Vacaciones', 'Licencias', 'Eliminados'],
       loader: (s, t) => _svc.personal(search: s, tab: t),
       rowIcon: Icons.person_outline_rounded,
@@ -85,81 +82,55 @@ class _PersonalScreenState extends State<PersonalScreen> {
 
 // ---------------- 2. GESTIÓN DE CATÁLOGOS ----------------
 class CatalogosHubScreen extends StatelessWidget {
-  const CatalogosHubScreen({super.key});
+  /// Pestaña inicial: 0 Categorías · 1 Canales · 2 Ubicaciones · 3 Unidades.
+  final int initialIndex;
+
+  const CatalogosHubScreen({super.key, this.initialIndex = 0});
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
+      initialIndex: initialIndex.clamp(0, 3),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    if (Navigator.canPop(context))
-                      IconButton(
-                          onPressed: () => Navigator.maybePop(context),
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Color(0xFF0096C7))),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Gestión de Catálogos',
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0A3642))),
-                          Text('Tablas auxiliares del sistema',
-                              style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4A7C8E))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const TabBar(
-                isScrollable: true,
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0xFF4A7C8E),
-                indicator: BoxDecoration(color: Color(0xFF0096C7)),
+        backgroundColor: AppColors.backgroundLight,
+        // UNA sola cabecera para todo el hub (pestañas segmentadas).
+        body: Column(
+          children: [
+            ErpHeader(
+              title: 'Gestión de Catálogos',
+              subtitle: 'Tablas auxiliares del sistema',
+              bottom: const ErpSegmentedTabs(
                 tabs: [
-                  Tab(text: 'Categorías'),
-                  Tab(text: 'Canales'),
-                  Tab(text: 'Ubicaciones'),
-                  Tab(text: 'Unidades'),
+                  ErpTabSpec('Categorías', icon: Icons.folder_outlined),
+                  ErpTabSpec('Canales', icon: Icons.share_outlined),
+                  ErpTabSpec('Ubicaciones', icon: Icons.place_outlined),
+                  ErpTabSpec('Unidades', icon: Icons.scale_outlined),
                 ],
               ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    _CatalogoTab(
-                        title: 'Categorías de Productos',
-                        endpoint: '/categorias',
-                        icon: Icons.folder_outlined),
-                    _CatalogoTab(
-                        title: 'Canales de Pedido',
-                        endpoint: '/canales-pedido',
-                        icon: Icons.share_outlined),
-                    _CatalogoTab(
-                        title: 'Ubicaciones',
-                        endpoint: '/ubicaciones',
-                        icon: Icons.place_outlined),
-                    _CatalogoTab(
-                        title: 'Unidades de Medida',
-                        endpoint: '/unidades-medida',
-                        icon: Icons.scale_outlined),
-                  ],
-                ),
+            ),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _CatalogoTab(
+                      title: 'Categorías de Productos',
+                      endpoint: '/categorias',
+                      icon: Icons.folder_outlined),
+                  _CatalogoTab(
+                      title: 'Canales de Pedido',
+                      endpoint: '/canales-pedido',
+                      icon: Icons.share_outlined),
+                  _CatalogoTab(
+                      title: 'Ubicaciones',
+                      endpoint: '/ubicaciones',
+                      icon: Icons.place_outlined),
+                  _CatalogoTab(
+                      title: 'Unidades de Medida',
+                      endpoint: '/unidades-medida',
+                      icon: Icons.scale_outlined),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -213,13 +184,9 @@ class _CatalogoTabState extends State<_CatalogoTab> {
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey('$_r${widget.endpoint}'),
+      incrustado: true, // la ÚNICA cabecera es la del hub
       title: widget.title,
       subtitle: 'Crear, editar y cambiar estado',
-      heroLabel: widget.title,
-      heroValue: '•',
-      heroCaption: 'CRUD completo habilitado',
-      heroIcon: widget.icon,
-      kpis: const [],
       tabs: const ['Todos'],
       loader: (s, t) => _loader(s, t),
       rowIcon: widget.icon,
@@ -256,58 +223,36 @@ class _CatalogoTabState extends State<_CatalogoTab> {
 
 // ---------------- 3. ROLES Y SEGURIDAD ----------------
 class SeguridadHubScreen extends StatelessWidget {
-  const SeguridadHubScreen({super.key});
+  /// Pestaña inicial: 0 Roles · 1 Cargos.
+  final int initialIndex;
+
+  const SeguridadHubScreen({super.key, this.initialIndex = 0});
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
+      initialIndex: initialIndex.clamp(0, 1),
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  children: [
-                    if (Navigator.canPop(context))
-                      IconButton(
-                          onPressed: () => Navigator.maybePop(context),
-                          icon: const Icon(Icons.arrow_back_rounded,
-                              color: Color(0xFF0096C7))),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Roles y Seguridad',
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0A3642))),
-                          Text('Roles de usuario y cargos',
-                              style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4A7C8E))),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+        backgroundColor: AppColors.backgroundLight,
+        // UNA sola cabecera para todo el hub (pestañas segmentadas).
+        body: Column(
+          children: [
+            ErpHeader(
+              title: 'Roles y Seguridad',
+              subtitle: 'Roles de usuario y cargos',
+              bottom: const ErpSegmentedTabs(
+                tabs: [
+                  ErpTabSpec('Roles', icon: Icons.key_outlined),
+                  ErpTabSpec('Cargos', icon: Icons.badge_outlined),
+                ],
               ),
-              const TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Color(0xFF4A7C8E),
-                indicator: BoxDecoration(color: Color(0xFF0096C7)),
-                tabs: [Tab(text: 'Roles'), Tab(text: 'Cargos')],
+            ),
+            const Expanded(
+              child: TabBarView(
+                children: [_RolesTab(), _CargosTab()],
               ),
-              const Expanded(
-                child: TabBarView(
-                  children: [_RolesTab(), _CargosTab()],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -327,13 +272,9 @@ class _RolesTabState extends State<_RolesTab> {
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey(_r),
+      incrustado: true, // la ÚNICA cabecera es la del hub
       title: 'Roles de Usuario',
       subtitle: 'Permisos del sistema',
-      heroLabel: 'Roles',
-      heroValue: '3',
-      heroCaption: 'CRUD inline como en web',
-      heroIcon: Icons.key_outlined,
-      kpis: const [],
       tabs: const ['Todos'],
       loader: (s, t) => _svc.roles(search: s),
       rowIcon: Icons.key_outlined,
@@ -383,13 +324,9 @@ class _CargosTabState extends State<_CargosTab> {
   Widget build(BuildContext context) {
     return ErpListScreen(
       key: ValueKey(_r),
+      incrustado: true, // la ÚNICA cabecera es la del hub
       title: 'Cargos de Personal',
       subtitle: 'Puestos y funciones',
-      heroLabel: 'Cargos',
-      heroValue: '3',
-      heroCaption: 'CRUD inline como en web',
-      heroIcon: Icons.work_outline_rounded,
-      kpis: const [],
       tabs: const ['Todos'],
       loader: (s, t) => _svc.cargos(search: s),
       rowIcon: Icons.work_outline_rounded,
@@ -452,76 +389,52 @@ class _EmpresaScreenState extends State<EmpresaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-              child: Row(
-                children: [
-                  if (Navigator.canPop(context))
-                    IconButton(
-                        onPressed: () => Navigator.maybePop(context),
-                        icon: const Icon(Icons.arrow_back_rounded,
-                            color: Color(0xFF0096C7))),
-                  const Expanded(
-                    child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Datos de la Empresa',
-                              style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF0A3642))),
-                          Text('Comercial Valencia • RUC oficial',
-                              style: TextStyle(
-                                  fontSize: 11.5,
-                                  color: Color(0xFF4A7C8E))),
-                        ]),
-                  ),
-                  IconButton(
-                    onPressed: _loading
-                        ? null
-                        : () => ErpFormSheet.show(
-                              context,
-                              title: 'Editar empresa',
-                              fields: [
-                                ErpField(
-                                    key: 'EmpresaRuc',
-                                    label: 'RUC (11 dígitos)'),
-                                ErpField(
-                                    key: 'EmpresaRazonSocial',
-                                    label: 'Razón social'),
-                                ErpField(
-                                    key: 'EmpresaNombreComercial',
-                                    label: 'Nombre comercial'),
-                                ErpField(
-                                    key: 'EmpresaDireccion',
-                                    label: 'Dirección'),
-                                ErpField(
-                                    key: 'EmpresaTelefono',
-                                    label: 'Teléfono'),
-                                ErpField(
-                                    key: 'EmpresaEmail',
-                                    label: 'Email'),
-                              ],
-                              initial: (_data ?? {}).map((k, v) =>
-                                  MapEntry(k.toString(), '${v ?? ''}')),
-                              onSave: (d) =>
-                                  _svc.actualizarEmpresa(d),
-                              onSaved: () {
-                                _load();
-                                _snack(context,
-                                    'Empresa actualizada.');
-                              },
-                            ),
-                    icon: const Icon(Icons.edit_outlined,
-                        color: Color(0xFF0096C7)),
-                  ),
-                ],
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          ErpHeader(
+            title: 'Datos de la Empresa',
+            subtitle: 'Comercial Valencia • RUC oficial',
+            actions: [
+              ErpCircleButton(
+                icon: Icons.edit_outlined,
+                tooltip: 'Editar empresa',
+                onTap: _loading
+                    ? null
+                    : () => ErpFormSheet.show(
+                          context,
+                          title: 'Editar empresa',
+                          fields: [
+                            ErpField(
+                                key: 'EmpresaRuc',
+                                label: 'RUC (11 dígitos)'),
+                            ErpField(
+                                key: 'EmpresaRazonSocial',
+                                label: 'Razón social'),
+                            ErpField(
+                                key: 'EmpresaNombreComercial',
+                                label: 'Nombre comercial'),
+                            ErpField(
+                                key: 'EmpresaDireccion',
+                                label: 'Dirección'),
+                            ErpField(
+                                key: 'EmpresaTelefono',
+                                label: 'Teléfono'),
+                            ErpField(
+                                key: 'EmpresaEmail',
+                                label: 'Email'),
+                          ],
+                          initial: (_data ?? {}).map((k, v) =>
+                              MapEntry(k.toString(), '${v ?? ''}')),
+                          onSave: (d) => _svc.actualizarEmpresa(d),
+                          onSaved: () {
+                            _load();
+                            _snack(context, 'Empresa actualizada.');
+                          },
+                        ),
               ),
-            ),
+            ],
+          ),
             Expanded(
               child: _loading
                   ? const Center(
@@ -562,7 +475,6 @@ class _EmpresaScreenState extends State<EmpresaScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -571,23 +483,23 @@ class _EmpresaScreenState extends State<EmpresaScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFCAF0F8)),
+        color: AppColors.surfaceLight,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.hairline),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(k,
-              style: const TextStyle(
-                  fontSize: 12, color: Color(0xFF4A7C8E))),
+              style: TextStyle(
+                  fontSize: 12, color: AppColors.textMuted)),
           Flexible(
               child: Text(v,
                   textAlign: TextAlign.end,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF0A3642)))),
+                      color: AppColors.textDark))),
         ],
       ),
     );

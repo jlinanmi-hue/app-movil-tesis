@@ -200,14 +200,14 @@ class _FeedbackBarWidgetState extends State<FeedbackBarWidget> with TickerProvid
             ? const Color(0xFFECFDF5)
             : isDisliked
                 ? const Color(0xFFFEF2F2)
-                : AppColors.surfaceMuted,
+                : AppColors.fixedSurfaceMuted,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
           color: isLiked
               ? const Color(0xFF6EE7B7)
               : isDisliked
                   ? const Color(0xFFFCA5A5)
-                  : AppColors.borderLight,
+                  : AppColors.fixedBorderLight,
           width: isLiked || isDisliked ? 1.2 : 1.0,
         ),
         boxShadow: isLiked
@@ -245,43 +245,43 @@ class _FeedbackBarWidgetState extends State<FeedbackBarWidget> with TickerProvid
               ),
             ),
             child: isLiked
-                ? const Row(
+                ? Row(
                     key: ValueKey('liked_text'),
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 13, color: AppColors.successDark),
+                      Icon(Icons.check_circle_rounded, size: 13, color: AppColors.fixedSuccessDark),
                       SizedBox(width: 4),
                       Text(
                         '¡Validación registrada!',
                         style: TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.successDark,
+                          color: AppColors.fixedSuccessDark,
                         ),
                       ),
                     ],
                   )
                 : isDisliked
-                    ? const Row(
+                    ? Row(
                         key: ValueKey('disliked_text'),
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.report_problem_rounded, size: 13, color: AppColors.errorDark),
+                          Icon(Icons.report_problem_rounded, size: 13, color: AppColors.fixedErrorDark),
                           SizedBox(width: 4),
                           Text(
                             'Inconsistencia reportada',
                             style: TextStyle(
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.errorDark,
+                              color: AppColors.fixedErrorDark,
                             ),
                           ),
                         ],
                       )
-                    : const Text(
+                    : Text(
                         '¿Fue útil esta respuesta?',
                         key: ValueKey('unvoted_text'),
-                        style: TextStyle(fontSize: 10.5, color: AppColors.textSubtle),
+                        style: TextStyle(fontSize: 10.5, color: AppColors.fixedTextSubtle),
                       ),
           ),
           const SizedBox(width: 8),
@@ -326,18 +326,18 @@ class _FeedbackBarWidgetState extends State<FeedbackBarWidget> with TickerProvid
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: _sending
-                                ? const SizedBox(
+                                ? SizedBox(
                                     width: 15,
                                     height: 15,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: AppColors.successDark,
+                                      color: AppColors.fixedSuccessDark,
                                     ),
                                   )
                                 : Icon(
                                     isLiked ? Icons.thumb_up_rounded : Icons.thumb_up_alt_outlined,
                                     size: 15,
-                                    color: isLiked ? AppColors.successDark : AppColors.textMuted,
+                                    color: isLiked ? AppColors.fixedSuccessDark : AppColors.fixedTextMuted,
                                   ),
                           ),
                         ),
@@ -375,7 +375,7 @@ class _FeedbackBarWidgetState extends State<FeedbackBarWidget> with TickerProvid
                         child: Icon(
                           isDisliked ? Icons.thumb_down_rounded : Icons.thumb_down_alt_outlined,
                           size: 15,
-                          color: isDisliked ? AppColors.errorDark : AppColors.textMuted,
+                          color: isDisliked ? AppColors.fixedErrorDark : AppColors.fixedTextMuted,
                         ),
                       ),
                     ),

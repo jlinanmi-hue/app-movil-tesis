@@ -18,7 +18,7 @@ class OrderFlowWidget extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppColors.borderLight),
+        side: BorderSide(color: AppColors.borderLight),
       ),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -33,7 +33,7 @@ class OrderFlowWidget extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
                         'Flujo General de Órdenes en Tiempo Real',
                         style: TextStyle(
@@ -62,7 +62,7 @@ class OrderFlowWidget extends StatelessWidget {
                   ),
                   child: Text(
                     'Total: ${data?.totalPedidosFormateado ?? '21'}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'monospace',
@@ -89,7 +89,7 @@ class OrderFlowWidget extends StatelessWidget {
                       badge: data?.recepcionIa.badge ?? 'Registrados: 21',
                       icon: Icons.auto_awesome_rounded,
                       color: AppColors.primaryBlue,
-                      bgColor: const Color(0xFFEFF6FF),
+                      bgColor: AppColors.celesteTint,
                       width: itemWidth,
                     ),
                     _buildStageCard(
@@ -162,7 +162,7 @@ class OrderFlowWidget extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
               color: AppColors.textDark,
@@ -172,7 +172,7 @@ class OrderFlowWidget extends StatelessWidget {
           ),
           Text(
             subtitle,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               color: AppColors.textSubtle,
             ),

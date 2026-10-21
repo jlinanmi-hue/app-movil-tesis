@@ -3,6 +3,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/exceptions/api_exception.dart';
 import '../../core/services/api_service.dart';
 import '../../core/services/session_service.dart';
+import '../../core/widgets/erp_ui.dart';
 
 class AccountSecurityScreen extends StatefulWidget {
   const AccountSecurityScreen({super.key});
@@ -118,7 +119,7 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
             ),
           ],
         ),
-        backgroundColor: isError ? AppColors.error : AppColors.successDark,
+        backgroundColor: isError ? AppColors.error : AppColors.successFill,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -131,20 +132,12 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
     final user = SessionService.currentUser;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: AppColors.headerNavy,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text(
-          'Seguridad & Contraseña',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-      body: SingleChildScrollView(
+      backgroundColor: AppColors.backgroundLight,
+      body: Column(
+        children: [
+          const ErpHeader(title: 'Seguridad & Contraseña'),
+          Expanded(
+            child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(18, 20, 18, 40),
         child: Column(
           children: [
@@ -154,16 +147,9 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: AppColors.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF0F172A).withValues(alpha: 0.03),
-                    blurRadius: 14,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.hairline),
               ),
               child: Form(
                 key: _formKey,
@@ -175,48 +161,61 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFAF5FF),
+                            color: AppColors.celesteTint,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.shield_outlined, size: 20, color: Color(0xFF7C3AED)),
+                          child: Icon(Icons.shield_outlined, size: 20, color: AppColors.celesteDeep),
                         ),
                         const SizedBox(width: 12),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Seguridad de la Cuenta',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
-                            ),
-                            Text(
-                              'Actualiza tu correo y clave de acceso',
-                              style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
-                            ),
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Seguridad de la Cuenta',
+                                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                              ),
+                              Text(
+                                'Actualiza tu correo y clave de acceso',
+                                style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    const Divider(height: 28, color: AppColors.borderLight),
+                    Divider(height: 28, color: AppColors.borderLight),
 
                     // Usuario actual (Solo lectura informativo)
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                        color: AppColors.celesteTint,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.hairline),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.account_circle_outlined, size: 18, color: Color(0xFF64748B)),
+                          Icon(Icons.account_circle_outlined, size: 18, color: AppColors.celesteDeep),
                           const SizedBox(width: 8),
-                          const Text(
-                            'Usuario de acceso: ',
-                            style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
-                          ),
-                          Text(
-                            '@${user?.userName ?? 'admin'}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textDark),
+                          Expanded(
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'Usuario de acceso: ',
+                                style: TextStyle(
+                                    fontSize: 12, color: AppColors.textMuted),
+                                children: [
+                                  TextSpan(
+                                    text: '@${user?.userName ?? 'admin'}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textDark),
+                                  ),
+                                ],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -240,15 +239,15 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                     ),
 
                     const SizedBox(height: 20),
-                    const Divider(height: 1, color: AppColors.borderLight),
+                    Divider(height: 1, color: AppColors.borderLight),
                     const SizedBox(height: 16),
 
-                    const Text(
+                    Text(
                       'Cambio de Contraseña (Opcional)',
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.textDark),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Deja estos campos en blanco si solo deseas modificar tu correo electrónico.',
                       style: TextStyle(fontSize: 11, color: AppColors.textSubtle),
                     ),
@@ -326,10 +325,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF0B132B),
+                          backgroundColor: AppColors.celesteDeep,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          elevation: 2,
+                          elevation: 0,
                         ),
                       ),
                     ),
@@ -340,6 +339,9 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
           ],
         ),
       ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -348,10 +350,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       padding: const EdgeInsets.only(bottom: 6),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF334155),
+          color: AppColors.textMuted,
         ),
       ),
     );
@@ -364,27 +366,27 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
   }) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-      prefixIcon: Icon(icon, size: 18, color: const Color(0xFF64748B)),
+      hintStyle: TextStyle(fontSize: 13, color: AppColors.textSubtle),
+      prefixIcon: Icon(icon, size: 18, color: AppColors.textMuted),
       suffixIcon: suffix,
       filled: true,
-      fillColor: const Color(0xFFF8FAFC),
+      fillColor: AppColors.surfaceLight,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.hairline),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.hairline),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF7C3AED), width: 1.6),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.celesteDark, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error, width: 1.4),
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: AppColors.error, width: 1.4),
       ),
     );
   }

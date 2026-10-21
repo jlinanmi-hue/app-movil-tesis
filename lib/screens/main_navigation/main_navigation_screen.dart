@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/services/api_service.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/services/session_service.dart';
 import '../../core/services/theme_service.dart';
 import '../../core/theme/app_theme.dart';
@@ -58,6 +59,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> with Widget
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && SessionService.isLoggedIn) {
       ApiService().verifySession();
+      NotificationService.instance.fetchNotifications(isBackgroundPoll: true);
+    } else if (state == AppLifecycleState.paused && SessionService.isLoggedIn) {
+      // El usuario acaba de salir al escritorio u otra app: encolar verificación rápida en segundo plano
+      NotificationService.instance.fetchNotifications(isBackgroundPoll: true);
     }
   }
 
