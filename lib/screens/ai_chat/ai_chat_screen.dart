@@ -14,6 +14,7 @@ import 'widgets/ai_message_content_widget.dart';
 import 'widgets/chat_chart_widget.dart';
 import 'widgets/chat_table_widget.dart';
 import 'widgets/feedback_bar_widget.dart';
+import 'widgets/voice_recording_bar.dart';
 import '../erp/nuevo_pedido_screen.dart';
 import '../erp/nueva_compra_screen.dart';
 
@@ -139,12 +140,6 @@ class _AiChatScreenState extends State<AiChatScreen> {
     super.dispose();
   }
 
-  String _formatRecordingTime(int totalSeconds) {
-    final minutes = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
-  }
-
   Future<void> _startVoiceRecording() async {
     if (_isStreaming || _isTranscribing) return;
 
@@ -179,6 +174,9 @@ class _AiChatScreenState extends State<AiChatScreen> {
         setState(() {
           _recordingSeconds++;
         });
+        if (_recordingSeconds >= 120) {
+          _stopAndSendVoiceRecording();
+        }
       }
     });
   }
@@ -1018,117 +1016,55 @@ class _AiChatScreenState extends State<AiChatScreen> {
               child: SafeArea(
                 top: false,
                 bottom: widget.isModal,
-                child: _isTranscribing
-                    ? Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDFD),
-                          borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: const Color(0xFFCCFBF1)),
-                        ),
-                        child: Row(
-                          children: const [
-                            SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2.2, color: Color(0xFF008F9D)),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Transcribiendo audio con IA...',
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child: _isTranscribing
+                      ? Container(
+                          key: const ValueKey('transcribing_bar'),
+                          height: 52,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF6FF), // blue-50
+                            borderRadius: BorderRadius.circular(28),
+                            border: Border.all(color: const Color(0xFFBFDBFE)), // blue-200
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2.2, color: Color(0xFF2563EB)),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Transcribiendo nota de voz con IA...',
                                 style: TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF007A87),
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : _isRecording
-                        ? Row(
-                            children: [
-                              // Botón descartar grabación
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 24),
-                                tooltip: 'Descartar grabación',
-                                onPressed: _cancelVoiceRecording,
-                              ),
-                              // Estado de grabación en vivo con contador
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFEF2F2),
-                                    borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(color: const Color(0xFFFECACA)),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 10,
-                                        height: 10,
-                                        decoration: const BoxDecoration(
-                                          color: Color(0xFFEF4444),
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      const Text(
-                                        'Grabando audio...',
-                                        style: TextStyle(
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.w600,
-                                          color: Color(0xFFDC2626),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        _formatRecordingTime(_recordingSeconds),
-                                        style: const TextStyle(
-                                          fontSize: 12.5,
-                                          fontWeight: FontWeight.bold,
-                                          fontFamily: 'monospace',
-                                          color: Color(0xFFB91C1C),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              // Botón finalizar y transcribir
-                              GestureDetector(
-                                onTap: _stopAndSendVoiceRecording,
-                                child: Container(
-                                  width: 44,
-                                  height: 44,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF10B981),
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: const Color(0xFF10B981).withValues(alpha: 0.35),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Icon(
-                                    Icons.check_rounded,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
+                                  color: Color(0xFF1D4ED8), // blue-700
                                 ),
                               ),
                             ],
-                          )
-                        : Row(
-                            children: [
+                          ),
+                        )
+                      : _isRecording
+                          ? VoiceRecordingBar(
+                              key: const ValueKey('recording_bar'),
+                              recordingSeconds: _recordingSeconds,
+                              onCancel: _cancelVoiceRecording,
+                              onSend: _stopAndSendVoiceRecording,
+                              amplitudeStream: _recorderService.onAmplitudeChanged,
+                            )
+                          : Row(
+                              key: const ValueKey('input_bar'),
+                              children: [
                               // Botón de opciones sugeridas
                               IconButton(
                                 icon: const Icon(Icons.list_alt_rounded, color: Color(0xFF008F9D), size: 24),
@@ -1251,6 +1187,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
                               ),
                             ],
                           ),
+                ),
               ),
             ),
           ],

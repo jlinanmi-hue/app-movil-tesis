@@ -86,6 +86,27 @@ class VoiceRecorderService {
     return DateTime.now().difference(_recordingStartTime!);
   }
 
+  /// Retorna la amplitud de audio actual si está disponible
+  Future<double> getAmplitude() async {
+    try {
+      if (!_isRecording) return 0.0;
+      final amp = await _audioRecorder.getAmplitude();
+      final current = amp.current;
+      if (current.isInfinite || current.isNaN || current < -50.0) return 0.0;
+      return ((current + 50.0) / 50.0).clamp(0.0, 1.0);
+    } catch (_) {
+      return 0.0;
+    }
+  }
+
+  Stream<Amplitude>? get onAmplitudeChanged {
+    try {
+      return _audioRecorder.onAmplitudeChanged(const Duration(milliseconds: 60));
+    } catch (_) {
+      return null;
+    }
+  }
+
   void dispose() {
     _audioRecorder.dispose();
   }
