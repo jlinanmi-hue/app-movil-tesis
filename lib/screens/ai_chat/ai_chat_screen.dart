@@ -365,6 +365,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
   }
 
   Future<void> _procesarImagenVision(ImageSource source) async {
+    ChatMessageModel? botMsg;
     try {
       final xfile = await _imagePicker.pickImage(
         source: source,
@@ -390,7 +391,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
       // 2. Mensaje inicial del bot
       final botMsgId = 'bot_${DateTime.now().millisecondsSinceEpoch}';
-      final botMsg = ChatMessageModel(
+      botMsg = ChatMessageModel(
         id: botMsgId,
         sender: 'assistant',
         text: 'Interpretando imagen con Valencia Vision...',
@@ -400,7 +401,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
       setState(() {
         _messages.add(userMsg);
-        _messages.add(botMsg);
+        _messages.add(botMsg!);
       });
       _scrollToBottom();
 
@@ -417,8 +418,8 @@ class _AiChatScreenState extends State<AiChatScreen> {
 
       if (items.isEmpty) {
         setState(() {
-          botMsg.text = 'No logré identificar productos claros en la imagen. Intenta con una foto más nítida o escribe tu consulta en el chat.';
-          botMsg.isStreaming = false;
+          botMsg?.text = 'No logré identificar productos claros en la imagen. Intenta con una foto más nítida o escribe tu consulta en el chat.';
+          botMsg?.isStreaming = false;
           _isAnalyzingVision = false;
         });
         _scrollToBottom();
@@ -475,21 +476,27 @@ class _AiChatScreenState extends State<AiChatScreen> {
       ];
 
       setState(() {
-        botMsg.text = replyText;
-        botMsg.isStreaming = false;
-        botMsg.uiAction = uiAction;
-        botMsg.chips = chips;
+        botMsg?.text = replyText;
+        botMsg?.isStreaming = false;
+        botMsg?.uiAction = uiAction;
+        botMsg?.chips = chips;
         _isAnalyzingVision = false;
       });
       _scrollToBottom();
     } catch (e) {
       if (!mounted) return;
+      final errorMsg = e.toString().replaceAll('Exception: ', '').replaceAll('ApiException: ', '');
       setState(() {
+        if (botMsg != null) {
+          botMsg.text = '⚠️ No se pudo procesar la imagen: $errorMsg';
+          botMsg.isStreaming = false;
+        }
         _isAnalyzingVision = false;
       });
+      _scrollToBottom();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al interpretar imagen: ${e.toString().replaceAll('Exception: ', '')}'),
+          content: Text('Error al interpretar imagen: $errorMsg'),
           backgroundColor: AppColors.error,
         ),
       );
