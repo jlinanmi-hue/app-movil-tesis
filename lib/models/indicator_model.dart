@@ -87,7 +87,7 @@ class IndicatorItem {
       'pode': 95.0,
       'peor': 2.0,
       'prs': 3.0,
-      'tbpp': 40.0,
+      'tbpp': 180.0,
     };
 
     return IndicatorItem(

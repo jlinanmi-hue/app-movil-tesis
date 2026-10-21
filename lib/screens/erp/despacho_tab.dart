@@ -113,13 +113,16 @@ class _DespachoTabState extends State<DespachoTab> {
 
   bool _coincideFiltro(Map<String, dynamic> p) {
     final e = '${p['PedidoEstadoDespacho'] ?? ''}'.toUpperCase();
+    final estGeneral = '${p['PedidoEstado_pedido'] ?? p['PedidoEstado'] ?? ''}'.toUpperCase();
+    final esCerrado = _esFinal(e) || estGeneral == 'C' || estGeneral == 'A';
+
     switch (_filtro) {
       case 'Por atender':
-        return e.isEmpty || e == 'PENDIENTE' || e == 'PENDIENTE_DESPACHO';
+        return !esCerrado && (e.isEmpty || e == 'PENDIENTE' || e == 'PENDIENTE_DESPACHO');
       case 'En preparación':
-        return e == 'EN_PREPARACION';
+        return !esCerrado && e == 'EN_PREPARACION';
       case 'Cerradas':
-        return _esFinal(e);
+        return esCerrado;
       default:
         return true;
     }
@@ -388,9 +391,17 @@ class _DespachoTabState extends State<DespachoTab> {
         text: AppColors.successDark
       );
     }
-    if (s.startsWith('RECHAZADO') || s.contains('ANULADO')) {
+    if (s.startsWith('RECHAZADO') || s.contains('ANULADO') || s.contains('CANCELADO')) {
       return (
-        label: 'Rechazado',
+        label: s.contains('CANCELADO') ? 'Cancelado' : (s.contains('ANULADO') ? 'Anulado' : 'Rechazado'),
+        bg: AppColors.errorBg,
+        border: AppColors.errorBorder,
+        text: AppColors.errorDark
+      );
+    }
+    if (s.contains('DEVUELTO')) {
+      return (
+        label: 'Devuelto',
         bg: AppColors.errorBg,
         border: AppColors.errorBorder,
         text: AppColors.errorDark
@@ -408,7 +419,9 @@ class _DespachoTabState extends State<DespachoTab> {
     final s = (e ?? '').toUpperCase();
     return s.startsWith('ENTREGADO') ||
         s.startsWith('RECHAZADO') ||
-        s.contains('ANULADO');
+        s.contains('ANULADO') ||
+        s.contains('CANCELADO') ||
+        s.contains('DEVUELTO');
   }
 
   // ---------------- desplegable por pedido ----------------

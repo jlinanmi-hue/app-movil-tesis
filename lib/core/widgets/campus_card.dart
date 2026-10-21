@@ -196,6 +196,7 @@ class CampusListRow extends StatelessWidget {
     } else if (b.contains('inactiv') ||
         b.contains('anul') ||
         b.contains('cancel') ||
+        b.contains('rechaz') ||
         b.contains('elimin') ||
         b.contains('riesg')) {
       badgeBg = AppColors.errorBg;

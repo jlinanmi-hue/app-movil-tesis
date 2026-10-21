@@ -23,24 +23,24 @@ class ResumenJornadaModel {
 
   factory ResumenJornadaModel.fromJson(Map<String, dynamic> json) {
     return ResumenJornadaModel(
-      pedidosConteo: FormatUtils.parseInt(json['pedidos_conteo'], 14),
-      montoFacturado: FormatUtils.parseDouble(json['monto_facturado'], 3420.50),
-      clientesAtendidos: FormatUtils.parseInt(json['clientes_atendidos'], 11),
-      tiempoMedioSeg: FormatUtils.parseInt(json['tiempo_medio_seg'], 42),
-      porcentajeIa: FormatUtils.parseDouble(json['porcentaje_ia'], 68.4),
-      alertasActivas: FormatUtils.parseInt(json['alertas_activas'], 2),
+      pedidosConteo: FormatUtils.parseInt(json['pedidos_conteo'], 0),
+      montoFacturado: FormatUtils.parseDouble(json['monto_facturado'], 0.0),
+      clientesAtendidos: FormatUtils.parseInt(json['clientes_atendidos'], 0),
+      tiempoMedioSeg: FormatUtils.parseInt(json['tiempo_medio_seg'], 0),
+      porcentajeIa: FormatUtils.parseDouble(json['porcentaje_ia'], 0.0),
+      alertasActivas: FormatUtils.parseInt(json['alertas_activas'], 0),
       slaCumplimiento: FormatUtils.parseDouble(json['sla_cumplimiento'], 100.0),
     );
   }
 
   factory ResumenJornadaModel.fallback() {
     return const ResumenJornadaModel(
-      pedidosConteo: 14,
-      montoFacturado: 3420.50,
-      clientesAtendidos: 11,
-      tiempoMedioSeg: 42,
-      porcentajeIa: 68.4,
-      alertasActivas: 2,
+      pedidosConteo: 0,
+      montoFacturado: 0.0,
+      clientesAtendidos: 0,
+      tiempoMedioSeg: 0,
+      porcentajeIa: 0.0,
+      alertasActivas: 0,
       slaCumplimiento: 100.0,
     );
   }

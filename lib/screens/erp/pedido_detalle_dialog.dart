@@ -166,9 +166,9 @@ class _PedidoDetalleDialogState extends State<PedidoDetalleDialog> {
         text: AppColors.successDark
       );
     }
-    if (s.startsWith('CANCEL') || s.contains('ANULAD')) {
+    if (s.startsWith('CANCEL') || s.contains('ANULAD') || s.startsWith('RECHAZ')) {
       return (
-        label: 'Cancelada',
+        label: s.startsWith('RECHAZ') ? 'Rechazada' : (s.startsWith('CANCEL') ? 'Cancelada' : 'Anulada'),
         bg: AppColors.errorBg,
         border: AppColors.errorBorder,
         text: AppColors.errorDark
